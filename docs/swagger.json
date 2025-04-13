@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {
+            "name": "imlargo",
+            "url": "https://imlargo.dev"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "paths": {}
+}
