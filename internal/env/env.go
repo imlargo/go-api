@@ -23,13 +23,20 @@ func Initialize() error {
 		return err
 	}
 
-	// Validate required environment variables
+	// Define required environment variables
 	requiredEnvVars := []string{API_URL, PORT, SIA_URL}
+	var missingEnvVars []string
 
+	// Check for missing environment variables
 	for _, envVar := range requiredEnvVars {
 		if os.Getenv(envVar) == "" {
-			return fmt.Errorf("required environment variable %s is not set", envVar)
+			missingEnvVars = append(missingEnvVars, envVar)
 		}
+	}
+
+	// If there are missing variables, return an error listing them
+	if len(missingEnvVars) > 0 {
+		return fmt.Errorf("missing required environment variables: %v", missingEnvVars)
 	}
 
 	return nil
