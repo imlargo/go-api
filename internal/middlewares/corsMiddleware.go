@@ -2,14 +2,19 @@ package middlewares
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/imlargo/go-api/internal/env"
 )
 
 func NewCorsMiddleware() gin.HandlerFunc {
 
-	allowedOrigins := []string{}
+	host := os.Getenv(env.API_URL)
+	allowedOrigins := []string{
+		host,
+	}
 
 	config := cors.Config{
 		AllowOrigins: allowedOrigins,
