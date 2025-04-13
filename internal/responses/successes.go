@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luizweitz/go-api/internal/models"
+	"github.com/imlargo/go-api/internal/models"
 )
 
 func Ok[T any](c *gin.Context, data T) {
