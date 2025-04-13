@@ -11,7 +11,6 @@ import (
 const (
 	API_URL                 = "API_URL"
 	PORT                    = "PORT"
-	SIA_URL                 = "SIA_URL"
 	RATE_LIMIT_MAX_REQUESTS = "RATE_LIMIT_MAX_REQUESTS"
 	RATE_LIMIT_TIMEFRAME    = "RATE_LIMIT_TIMEFRAME"
 )
@@ -24,7 +23,7 @@ func Initialize() error {
 	}
 
 	// Define required environment variables
-	requiredEnvVars := []string{API_URL, PORT, SIA_URL}
+	requiredEnvVars := []string{API_URL, PORT}
 	var missingEnvVars []string
 
 	// Check for missing environment variables
