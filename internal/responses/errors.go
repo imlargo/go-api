@@ -54,3 +54,11 @@ func ErrorToManyRequests(c *gin.Context, message string) {
 		Status:  "TO_MANY_REQUESTS",
 	})
 }
+
+func ErrorUnauthorized(c *gin.Context, message string) {
+	c.JSON(http.StatusUnauthorized, models.Error{
+		Code:    http.StatusUnauthorized,
+		Message: message,
+		Status:  "UNAUTHORIZED",
+	})
+}

@@ -11,6 +11,13 @@ import (
 const (
 	API_URL                 = "API_URL"
 	PORT                    = "PORT"
+	DATABASE_URL            = "DATABASE_URL"
+	GOOGLE_CLIENT_ID        = "GOOGLE_CLIENT_ID"
+	GOOGLE_CLIENT_SECRET    = "GOOGLE_CLIENT_SECRET"
+	GOOGLE_REDIRECT_URL     = "GOOGLE_REDIRECT_URL"
+	JWT_SECRET              = "JWT_SECRET"
+	JWT_ISSUER              = "JWT_ISSUER"
+	JWT_AUDIENCE            = "JWT_AUDIENCE"
 	RATE_LIMIT_MAX_REQUESTS = "RATE_LIMIT_MAX_REQUESTS"
 	RATE_LIMIT_TIMEFRAME    = "RATE_LIMIT_TIMEFRAME"
 )
@@ -19,11 +26,11 @@ const (
 func Initialize() error {
 	// Load .env file if it exists
 	if err := godotenv.Load(); err != nil {
-		return err
+		fmt.Println("Error loading .env file, proceeding with system environment variables")
 	}
 
 	// Define required environment variables
-	requiredEnvVars := []string{API_URL, PORT}
+	requiredEnvVars := []string{API_URL, PORT, DATABASE_URL}
 	var missingEnvVars []string
 
 	// Check for missing environment variables
