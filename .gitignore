@@ -43,3 +43,6 @@ bin/
 # Logs
 logs
 *.log
+
+# Generated binaries
+main

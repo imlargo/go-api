@@ -1,1 +1,1 @@
-# Go Api
+# Go api template

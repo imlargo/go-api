@@ -1,0 +1,710 @@
+definitions:
+  github_com_imlargo_go-api-template_internal_application_dto_requests.GetPresignedURLRequest:
+    properties:
+      expiry_minutes:
+        type: integer
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_requests.LoginUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_requests.NotificationSubscriptionPayload:
+    properties:
+      device_id:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_requests.PushNotificationRequestPayload:
+    properties:
+      category:
+        type: string
+      message:
+        type: string
+      title:
+        type: string
+      userId:
+        type: integer
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_requests.RegisterUserRequest:
+    properties:
+      created_by:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      referral_code:
+        type: string
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_requests.SendNotificationRequestPayload:
+    properties:
+      notification:
+        $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.Notification'
+      user_id:
+        type: integer
+    required:
+    - notification
+    - user_id
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_responses.AuthResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_responses.AuthTokensResponse'
+      user:
+        $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.User'
+    type: object
+  github_com_imlargo_go-api-template_internal_application_dto_responses.AuthTokensResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        type: integer
+      refresh_token:
+        type: string
+    type: object
+  github_com_imlargo_go-api-template_internal_domain_enums.NotificationType:
+    enum:
+    - base
+    type: string
+    x-enum-varnames:
+    - NotificationTypeBase
+  github_com_imlargo_go-api-template_internal_domain_models.File:
+    properties:
+      content_type:
+        type: string
+      created_at:
+        type: string
+      etag:
+        type: string
+      id:
+        type: integer
+      path:
+        type: string
+      size:
+        type: integer
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_imlargo_go-api-template_internal_domain_models.Notification:
+    properties:
+      category:
+        $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_enums.NotificationType'
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      read:
+        type: boolean
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  github_com_imlargo_go-api-template_internal_domain_models.PushNotificationSubscription:
+    properties:
+      auth:
+        type: string
+      created_at:
+        type: string
+      endpoint:
+        type: string
+      id:
+        type: integer
+      p256dh:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  github_com_imlargo_go-api-template_internal_domain_models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  webpush.Keys:
+    properties:
+      auth:
+        type: string
+      p256dh:
+        type: string
+    type: object
+  webpush.Subscription:
+    properties:
+      endpoint:
+        type: string
+      keys:
+        $ref: '#/definitions/webpush.Keys'
+    type: object
+info:
+  contact:
+    name: Default
+    url: https://default.dev
+  description: Backend service template
+  license:
+    name: MIT
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Go api
+  version: "1.0"
+paths:
+  /api/v1/files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a file to the storage
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File uploaded successfully
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.File'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload file
+      tags:
+      - files
+  /api/v1/files/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a file by its ID
+      parameters:
+      - description: File ID
+        in: path
+        name: fileID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete file
+      tags:
+      - files
+    get:
+      consumes:
+      - application/json
+      description: Get a file by its ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.File'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "404":
+          description: File Not Found
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get file by ID
+      tags:
+      - files
+  /api/v1/files/{id}/download:
+    get:
+      consumes:
+      - application/json
+      description: Download a file by its ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: File downloaded successfully
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "404":
+          description: File Not Found
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Download file
+      tags:
+      - files
+  /api/v1/files/presigned-url:
+    post:
+      consumes:
+      - application/json
+      description: Get a presigned URL for uploading a file
+      parameters:
+      - description: File ID
+        in: path
+        name: fileID
+        required: true
+        type: integer
+      - description: Expiry time in minutes for the presigned URL
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.GetPresignedURLRequest'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get presigned URL for file upload
+      tags:
+      - files
+  /api/v1/notifications:
+    get:
+      consumes:
+      - application/json
+      description: Get all notifications for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User Notifications
+      tags:
+      - notifications
+  /api/v1/notifications/dispatch:
+    post:
+      consumes:
+      - application/json
+      description: Dispatch a notification (deprecated)
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - PushApiKey: []
+      summary: Dispatch Notification
+      tags:
+      - notifications
+  /api/v1/notifications/push/send:
+    post:
+      consumes:
+      - application/json
+      description: Send Push Notification
+      parameters:
+      - description: Push Notification Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.PushNotificationRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - PushApiKey: []
+      summary: Send Push Notification
+      tags:
+      - notifications
+  /api/v1/notifications/push/subscribe/{userID}:
+    post:
+      consumes:
+      - application/json
+      description: Subscribe to Push Notifications
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Subscription Payload
+        in: body
+        name: sub
+        required: true
+        schema:
+          $ref: '#/definitions/webpush.Subscription'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Subscribe to Push Notifications
+      tags:
+      - notifications
+  /api/v1/notifications/push/subscriptions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a specific push notification subscription by ID
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Push Notification Subscription
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.PushNotificationSubscription'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Push Subscription
+      tags:
+      - notifications
+  /api/v1/notifications/read:
+    post:
+      consumes:
+      - application/json
+      description: Mark notifications as read for a user since a specific time
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mark Notifications as Read
+      tags:
+      - notifications
+  /api/v1/notifications/send:
+    post:
+      consumes:
+      - application/json
+      description: Send realtime notifications to a user
+      parameters:
+      - description: Notification Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.SendNotificationRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - PushApiKey: []
+      summary: Send notification
+      tags:
+      - notifications
+  /api/v1/notifications/subscribe:
+    get:
+      consumes:
+      - application/json
+      description: Subscribe to real time notifications using Server-Sent Events (SSE)
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: Device ID
+        in: query
+        name: device_id
+        required: true
+        type: string
+      produces:
+      - text/event-stream
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Subscribe to notifications
+      tags:
+      - notifications
+  /api/v1/notifications/subscriptions:
+    get:
+      consumes:
+      - application/json
+      description: Get all SSE subscriptions
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - PushApiKey: []
+      summary: Get SSE Subscriptions
+      tags:
+      - notifications
+  /api/v1/notifications/unsubscribe:
+    post:
+      consumes:
+      - application/json
+      description: Unsubscribe from real time notifications using SSE
+      parameters:
+      - description: Unsubscribe Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.NotificationSubscriptionPayload'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unsuscribe SSE
+      tags:
+      - notifications
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user with email and password
+      parameters:
+      - description: Login user request payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged in successfully
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_responses.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Login user
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Get the authenticated user's information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Authenticated user's
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_domain_models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user info
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email, password, and other details
+      parameters:
+      - description: Register user request payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_requests.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_application_dto_responses.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_imlargo_go-api-template_internal_presentation_http_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  PushApiKey:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"
