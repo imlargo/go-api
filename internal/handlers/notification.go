@@ -7,12 +7,11 @@ import (
 
 	"github.com/SherClockHolmes/webpush-go"
 	"github.com/gin-gonic/gin"
-	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
+	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/enums"
 	"github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/internal/services"
-
 	"github.com/imlargo/go-api-template/internal/responses"
+	"github.com/imlargo/go-api-template/internal/services"
 )
 
 type NotificationController interface {
@@ -122,10 +121,10 @@ func (u *NotificationControllerImpl) SubscribeSSE(c *gin.Context) {
 // @Produce		json
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
-// @Param		payload body	requestsdto.SendNotificationRequestPayload	true	"Notification Payload"
+// @Param		payload body	dto.SendNotificationRequestPayload	true	"Notification Payload"
 // @Security     PushApiKey
 func (h *NotificationControllerImpl) DispatchSSE(c *gin.Context) {
-	var payload requestsdto.SendNotificationRequestPayload
+	var payload dto.SendNotificationRequestPayload
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBindJson(c, err)
 		return
@@ -159,12 +158,12 @@ func (h *NotificationControllerImpl) DispatchSSE(c *gin.Context) {
 // @Tags			notifications
 // @Accept			json
 // @Produce		json
-// @Param			payload body	requestsdto.NotificationSubscriptionPayload	true	"Unsubscribe Payload"
+// @Param			payload body	dto.NotificationSubscriptionPayload	true	"Unsubscribe Payload"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
 func (h *NotificationControllerImpl) UnsubscribeSSE(c *gin.Context) {
-	var payload requestsdto.NotificationSubscriptionPayload
+	var payload dto.NotificationSubscriptionPayload
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBindJson(c, err)
@@ -235,13 +234,13 @@ func (u *NotificationControllerImpl) SubscribePush(c *gin.Context) {
 // @Tags			notifications
 // @Accept			json
 // @Produce		json
-// @Param		payload body	requestsdto.PushNotificationRequestPayload	true	"Push Notification Payload"
+// @Param		payload body	dto.PushNotificationRequestPayload	true	"Push Notification Payload"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     PushApiKey
 func (u *NotificationControllerImpl) DispatchPush(c *gin.Context) {
 
-	var payload requestsdto.PushNotificationRequestPayload
+	var payload dto.PushNotificationRequestPayload
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBindJson(c, err)

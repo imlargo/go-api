@@ -7,11 +7,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
+	"github.com/imlargo/go-api-template/internal/dto"
 	_ "github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/internal/services"
-
 	"github.com/imlargo/go-api-template/internal/responses"
+	"github.com/imlargo/go-api-template/internal/services"
 )
 
 type FileController interface {
@@ -120,7 +119,7 @@ func (h *FileControllerImpl) DeleteFile(c *gin.Context) {
 // @Param			fileID	path	int				true	"File ID"
 // @Accept			json
 // @Produce		json
-// @Param		payload	body	requestsdto.GetPresignedURLRequest				true	"Expiry time in minutes for the presigned URL"
+// @Param		payload	body	dto.GetPresignedURLRequest				true	"Expiry time in minutes for the presigned URL"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
@@ -133,7 +132,7 @@ func (h *FileControllerImpl) GetPresignedURL(c *gin.Context) {
 	}
 
 	// Bind the request payload
-	var payload requestsdto.GetPresignedURLRequest
+	var payload dto.GetPresignedURLRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request data: "+err.Error())
 		return

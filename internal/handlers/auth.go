@@ -2,12 +2,10 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
-	_ "github.com/imlargo/go-api-template/internal/dto/responses"
+	"github.com/imlargo/go-api-template/internal/dto"
 	_ "github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/internal/services"
-
 	"github.com/imlargo/go-api-template/internal/responses"
+	"github.com/imlargo/go-api-template/internal/services"
 )
 
 type AuthController interface {
@@ -31,14 +29,14 @@ func NewAuthController(authService services.AuthService) AuthController {
 // @Description	Login user with email and password
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	requestsdto.LoginUserRequest	true	"Login user request payload"
+// @Param		payload	body	dto.LoginUserRequest	true	"Login user request payload"
 // @Produce		json
-// @Success		200	{object}	responsesdto.AuthResponse	"User logged in successfully"
+// @Success		200	{object}	dto.AuthResponse	"User logged in successfully"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
 func (a *authController) Login(c *gin.Context) {
-	var payload requestsdto.LoginUserRequest
+	var payload dto.LoginUserRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return
@@ -58,14 +56,14 @@ func (a *authController) Login(c *gin.Context) {
 // @Description	Register a new user with email, password, and other details
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	requestsdto.RegisterUserRequest	true	"Register user request payload"
+// @Param		payload	body	dto.RegisterUserRequest	true	"Register user request payload"
 // @Produce		json
-// @Success		200	{object}	responsesdto.AuthResponse	"User registered successfully
+// @Success		200	{object}	dto.AuthResponse	"User registered successfully
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
 func (a *authController) Register(c *gin.Context) {
-	var payload requestsdto.RegisterUserRequest
+	var payload dto.RegisterUserRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return

@@ -3,14 +3,14 @@ package services
 import (
 	"errors"
 
-	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
+	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
-	CreateUser(user *requestsdto.RegisterUserRequest) (*models.User, error)
+	CreateUser(user *dto.RegisterUserRequest) (*models.User, error)
 	DeleteUser(userID uint) error
 	UpdateUser(userID uint, data *models.User) (*models.User, error)
 	GetUserByID(userID uint) (*models.User, error)
@@ -27,7 +27,7 @@ func NewUserService(store *store.Store) UserService {
 	}
 }
 
-func (s *userServiceImpl) CreateUser(data *requestsdto.RegisterUserRequest) (*models.User, error) {
+func (s *userServiceImpl) CreateUser(data *dto.RegisterUserRequest) (*models.User, error) {
 	// Validate user data
 	user := &models.User{
 		Name:     data.Name,

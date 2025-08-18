@@ -1,4 +1,4 @@
-package requestsdto
+package dto
 
 import "github.com/imlargo/go-api-template/internal/models"
 

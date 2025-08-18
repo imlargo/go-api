@@ -1,4 +1,4 @@
-package requestsdto
+package dto
 
 import (
 	"mime/multipart"
@@ -10,4 +10,9 @@ type UploadFileRequest struct {
 
 type GetPresignedURLRequest struct {
 	ExpiryMins int `json:"expiry_minutes,omitempty"`
+}
+
+type PresignedURLResponse struct {
+	Url       string `json:"url"`
+	ExpiresAt string `json:"expires_at"`
 }

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	responsesdto "github.com/imlargo/go-api-template/internal/dto/responses"
+	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/storage"
@@ -24,7 +24,7 @@ type FileService interface {
 	UploadFileFromUrl(url string) (*models.File, error)
 	GetFile(id uint) (*models.File, error)
 	DeleteFile(id uint) error
-	GetPresignedURL(fileID uint, expiryMins int) (*responsesdto.PresignedURLResponse, error)
+	GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURLResponse, error)
 	BulkDeleteFiles(fileIDs []uint) error
 	DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error)
 }
@@ -178,7 +178,7 @@ func (u *fileServiceImpl) DeleteFile(id uint) error {
 	return nil
 }
 
-func (u *fileServiceImpl) GetPresignedURL(fileID uint, expiryMins int) (*responsesdto.PresignedURLResponse, error) {
+func (u *fileServiceImpl) GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURLResponse, error) {
 	file, err := u.store.Files.GetByID(fileID)
 	if err != nil {
 		return nil, fmt.Errorf("file not found: %w", err)
@@ -194,7 +194,7 @@ func (u *fileServiceImpl) GetPresignedURL(fileID uint, expiryMins int) (*respons
 		return nil, fmt.Errorf("failed to generate presigned URL: %w", err)
 	}
 
-	return &responsesdto.PresignedURLResponse{
+	return &dto.PresignedURLResponse{
 		Url:       url,
 		ExpiresAt: time.Now().Add(expiry).Format(time.RFC3339),
 	}, nil

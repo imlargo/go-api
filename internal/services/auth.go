@@ -5,8 +5,7 @@ import (
 	"time"
 
 	"github.com/imlargo/go-api-template/internal/config"
-	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
-	responsesdto "github.com/imlargo/go-api-template/internal/dto/responses"
+	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
@@ -14,10 +13,10 @@ import (
 )
 
 type AuthService interface {
-	Login(email, password string) (*responsesdto.AuthResponse, error)
-	Register(user *requestsdto.RegisterUserRequest) (*responsesdto.AuthResponse, error)
+	Login(email, password string) (*dto.AuthResponse, error)
+	Register(user *dto.RegisterUserRequest) (*dto.AuthResponse, error)
 	Logout(userID uint) error
-	RefreshToken(userID uint, refreshToken string) (*responsesdto.AuthTokensResponse, error)
+	RefreshToken(userID uint, refreshToken string) (*dto.AuthTokensResponse, error)
 	GetUserInfo(userID uint) (*models.User, error)
 }
 
@@ -37,7 +36,7 @@ func NewAuthService(store *store.Store, userService UserService, jwtAuthenticato
 	}
 }
 
-func (s *authServiceImpl) Login(email, password string) (*responsesdto.AuthResponse, error) {
+func (s *authServiceImpl) Login(email, password string) (*dto.AuthResponse, error) {
 	user, err := s.store.Users.GetByEmail(email)
 	if err != nil {
 		return nil, err
@@ -63,9 +62,9 @@ func (s *authServiceImpl) Login(email, password string) (*responsesdto.AuthRespo
 		return nil, err
 	}
 
-	authResponse := &responsesdto.AuthResponse{
+	authResponse := &dto.AuthResponse{
 		User: *user,
-		Tokens: responsesdto.AuthTokensResponse{
+		Tokens: dto.AuthTokensResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 			ExpiresAt:    refreshExpiration.Unix(),
@@ -75,7 +74,7 @@ func (s *authServiceImpl) Login(email, password string) (*responsesdto.AuthRespo
 	return authResponse, nil
 }
 
-func (s *authServiceImpl) Register(user *requestsdto.RegisterUserRequest) (*responsesdto.AuthResponse, error) {
+func (s *authServiceImpl) Register(user *dto.RegisterUserRequest) (*dto.AuthResponse, error) {
 
 	createdUser, err := s.userService.CreateUser(user)
 	if err != nil {
@@ -94,9 +93,9 @@ func (s *authServiceImpl) Register(user *requestsdto.RegisterUserRequest) (*resp
 		return nil, err
 	}
 
-	authResponse := &responsesdto.AuthResponse{
+	authResponse := &dto.AuthResponse{
 		User: *createdUser,
-		Tokens: responsesdto.AuthTokensResponse{
+		Tokens: dto.AuthTokensResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 			ExpiresAt:    refreshExpiration.Unix(),
@@ -110,7 +109,7 @@ func (s *authServiceImpl) Logout(userID uint) error {
 	return nil
 }
 
-func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*responsesdto.AuthTokensResponse, error) {
+func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*dto.AuthTokensResponse, error) {
 	return nil, nil
 }
 
