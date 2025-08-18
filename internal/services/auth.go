@@ -20,7 +20,7 @@ type AuthService interface {
 	GetUser(userID uint) (*models.User, error)
 }
 
-type authServiceImpl struct {
+type authService struct {
 	store            *store.Store
 	userService      UserService
 	jwtAuthenticator *jwt.JWT
@@ -28,7 +28,7 @@ type authServiceImpl struct {
 }
 
 func NewAuthService(store *store.Store, userService UserService, jwtAuthenticator *jwt.JWT, authConfig config.AuthConfig) AuthService {
-	return &authServiceImpl{
+	return &authService{
 		store,
 		userService,
 		jwtAuthenticator,
@@ -36,7 +36,7 @@ func NewAuthService(store *store.Store, userService UserService, jwtAuthenticato
 	}
 }
 
-func (s *authServiceImpl) Login(email, password string) (*dto.UserAuthResponse, error) {
+func (s *authService) Login(email, password string) (*dto.UserAuthResponse, error) {
 	user, err := s.store.Users.GetByEmail(email)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (s *authServiceImpl) Login(email, password string) (*dto.UserAuthResponse, 
 	return authResponse, nil
 }
 
-func (s *authServiceImpl) Register(user *dto.RegisterUser) (*dto.UserAuthResponse, error) {
+func (s *authService) Register(user *dto.RegisterUser) (*dto.UserAuthResponse, error) {
 
 	createdUser, err := s.userService.CreateUser(user)
 	if err != nil {
@@ -105,15 +105,15 @@ func (s *authServiceImpl) Register(user *dto.RegisterUser) (*dto.UserAuthRespons
 	return authResponse, nil
 }
 
-func (s *authServiceImpl) Logout(userID uint) error {
+func (s *authService) Logout(userID uint) error {
 	return nil
 }
 
-func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*dto.AuthTokens, error) {
+func (s *authService) RefreshToken(userID uint, refreshToken string) (*dto.AuthTokens, error) {
 	return nil, nil
 }
 
-func (s *authServiceImpl) GetUser(userID uint) (*models.User, error) {
+func (s *authService) GetUser(userID uint) (*models.User, error) {
 	if userID == 0 {
 		return nil, errors.New("user ID cannot be zero")
 	}

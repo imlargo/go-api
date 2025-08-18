@@ -17,17 +17,17 @@ type UserService interface {
 	GetUserByEmail(email string) (*models.User, error)
 }
 
-type userServiceImpl struct {
+type userService struct {
 	store *store.Store
 }
 
 func NewUserService(store *store.Store) UserService {
-	return &userServiceImpl{
+	return &userService{
 		store,
 	}
 }
 
-func (s *userServiceImpl) CreateUser(data *dto.RegisterUser) (*models.User, error) {
+func (s *userService) CreateUser(data *dto.RegisterUser) (*models.User, error) {
 	// Validate user data
 	user := &models.User{
 		Name:     data.Name,
@@ -62,18 +62,18 @@ func (s *userServiceImpl) CreateUser(data *dto.RegisterUser) (*models.User, erro
 	return user, nil
 }
 
-func (s *userServiceImpl) DeleteUser(userID uint) error {
+func (s *userService) DeleteUser(userID uint) error {
 	return nil
 }
 
-func (s *userServiceImpl) UpdateUser(userID uint, data *models.User) (*models.User, error) {
+func (s *userService) UpdateUser(userID uint, data *models.User) (*models.User, error) {
 	return nil, nil
 }
 
-func (s *userServiceImpl) GetUserByID(userID uint) (*models.User, error) {
+func (s *userService) GetUserByID(userID uint) (*models.User, error) {
 	return nil, nil
 }
 
-func (s *userServiceImpl) GetUserByEmail(email string) (*models.User, error) {
+func (s *userService) GetUserByEmail(email string) (*models.User, error) {
 	return nil, nil
 }

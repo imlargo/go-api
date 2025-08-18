@@ -31,21 +31,21 @@ type NotificationService interface {
 	MarkNotificationsAsRead(userID uint) error
 }
 
-type notificationServiceImpl struct {
+type notificationService struct {
 	store *store.Store
 	SSE   sse.SSEManager
 	Push  push.PushNotifier
 }
 
 func NewNotificationService(store *store.Store, sse sse.SSEManager, push push.PushNotifier) NotificationService {
-	return &notificationServiceImpl{
+	return &notificationService{
 		store: store,
 		SSE:   sse,
 		Push:  push,
 	}
 }
 
-func (d *notificationServiceImpl) DispatchNotification(userID uint, title, message string, notifType string) error {
+func (d *notificationService) DispatchNotification(userID uint, title, message string, notifType string) error {
 	notification := &models.Notification{
 		UserID:      userID,
 		Title:       title,
@@ -67,7 +67,7 @@ func (d *notificationServiceImpl) DispatchNotification(userID uint, title, messa
 	return nil
 }
 
-func (d *notificationServiceImpl) DispatchSSE(notification *models.Notification) error {
+func (d *notificationService) DispatchSSE(notification *models.Notification) error {
 	// 1. Guardar en base de datos
 	err := d.store.Notifications.Create(notification)
 	if err != nil {
@@ -81,7 +81,7 @@ func (d *notificationServiceImpl) DispatchSSE(notification *models.Notification)
 	})
 }
 
-func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models.Notification) error {
+func (d *notificationService) DispatchPush(userID uint, notification *models.Notification) error {
 
 	subs, err := d.store.PushSubscriptions.GetSubscriptionsByUser(userID)
 
@@ -108,15 +108,15 @@ func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models
 	return nil
 }
 
-func (d *notificationServiceImpl) SubscribeSSE(ctx context.Context, userID uint, deviceID string) (sse.Connection, error) {
+func (d *notificationService) SubscribeSSE(ctx context.Context, userID uint, deviceID string) (sse.Connection, error) {
 	return d.SSE.Subscribe(ctx, userID, deviceID)
 }
 
-func (d *notificationServiceImpl) UnsubscribeSSE(userID uint, deviceID string) error {
+func (d *notificationService) UnsubscribeSSE(userID uint, deviceID string) error {
 	return d.SSE.Unsubscribe(userID, deviceID)
 }
 
-func (d *notificationServiceImpl) SubscribePush(userID uint, endpoint string, p256dh string, auth string) (*models.PushNotificationSubscription, error) {
+func (d *notificationService) SubscribePush(userID uint, endpoint string, p256dh string, auth string) (*models.PushNotificationSubscription, error) {
 	sub := &models.PushNotificationSubscription{
 		UserID:   userID,
 		Endpoint: endpoint,
@@ -133,15 +133,15 @@ func (d *notificationServiceImpl) SubscribePush(userID uint, endpoint string, p2
 	return sub, nil
 }
 
-func (d *notificationServiceImpl) UnsubscribePush(subscriptionID uint) error {
+func (d *notificationService) UnsubscribePush(subscriptionID uint) error {
 	return d.store.PushSubscriptions.Delete(subscriptionID)
 }
 
-func (d *notificationServiceImpl) GetSSESubscriptions() map[string]interface{} {
+func (d *notificationService) GetSSESubscriptions() map[string]interface{} {
 	return d.SSE.GetSSESubscriptions()
 }
 
-func (d *notificationServiceImpl) GetUserNotifications(userID uint) ([]*models.Notification, error) {
+func (d *notificationService) GetUserNotifications(userID uint) ([]*models.Notification, error) {
 	if userID == 0 {
 		return nil, errors.New("user ID is required")
 	}
@@ -154,7 +154,7 @@ func (d *notificationServiceImpl) GetUserNotifications(userID uint) ([]*models.N
 	return notifications, nil
 }
 
-func (d *notificationServiceImpl) MarkNotificationsAsRead(userID uint) error {
+func (d *notificationService) MarkNotificationsAsRead(userID uint) error {
 	if userID == 0 {
 		return errors.New("user ID is required")
 	}
@@ -168,7 +168,7 @@ func (d *notificationServiceImpl) MarkNotificationsAsRead(userID uint) error {
 	return nil
 }
 
-func (d *notificationServiceImpl) GetPushSubscription(subscriptionID uint) (*models.PushNotificationSubscription, error) {
+func (d *notificationService) GetPushSubscription(subscriptionID uint) (*models.PushNotificationSubscription, error) {
 	if subscriptionID == 0 {
 		return nil, errors.New("subscription ID is required")
 	}
