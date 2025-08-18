@@ -35,12 +35,10 @@ type Application struct {
 
 func (app *Application) Mount() {
 
-	jwtAuthenticator := jwt.NewJwt(jwt.Config{
-		Secret:            app.Config.Auth.JwtSecret,
-		Issuer:            app.Config.Auth.JwtIssuer,
-		Audience:          app.Config.Auth.JwtAudience,
-		TokenExpiration:   app.Config.Auth.TokenExpiration,
-		RefreshExpiration: app.Config.Auth.RefreshExpiration,
+	jwtAuth := jwt.NewJwt(jwt.Config{
+		Secret:   app.Config.Auth.JwtSecret,
+		Issuer:   app.Config.Auth.JwtIssuer,
+		Audience: app.Config.Auth.JwtAudience,
 	})
 
 	// Adapters
@@ -49,7 +47,7 @@ func (app *Application) Mount() {
 
 	// Services
 	userService := services.NewUserService(app.Store)
-	authService := services.NewAuthService(app.Store, userService, jwtAuthenticator)
+	authService := services.NewAuthService(app.Store, userService, jwtAuth, app.Config.Auth)
 	fileService := services.NewFileService(app.Store, app.Storage, app.Config.Storage.BucketName)
 	notificationService := services.NewNotificationService(app.Store, sseNotificationDispatcher, pushNotificationDispatcher)
 
@@ -60,7 +58,7 @@ func (app *Application) Mount() {
 
 	// Middlewares
 	apiKeyMiddleware := middleware.ApiKeyMiddleware(app.Config.Auth.ApiKey)
-	authMiddleware := middleware.AuthTokenMiddleware(jwtAuthenticator)
+	authMiddleware := middleware.AuthTokenMiddleware(jwtAuth)
 	metricsMiddleware := middleware.NewMetricsMiddleware(app.Metrics)
 	rateLimiterMiddleware := middleware.NewRateLimiterMiddleware(app.RateLimiter)
 	corsMiddleware := middleware.NewCorsMiddleware(app.Config.Server.Host, []string{"http://localhost:5173"})

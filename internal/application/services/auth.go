@@ -2,12 +2,14 @@ package services
 
 import (
 	"errors"
+	"time"
 
 	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
 	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
+	"github.com/imlargo/go-api-template/internal/config"
 	"github.com/imlargo/go-api-template/internal/domain/models"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
 	"github.com/imlargo/go-api-template/internal/store"
+	"github.com/imlargo/go-api-template/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,42 +24,51 @@ type AuthService interface {
 type authServiceImpl struct {
 	store            *store.Store
 	userService      UserService
-	jwtAuthenticator ports.JWTAuthenticator
+	jwtAuthenticator *jwt.JWT
+	authConfig       config.AuthConfig
 }
 
-func NewAuthService(store *store.Store, userService UserService, jwtAuthenticator ports.JWTAuthenticator) AuthService {
+func NewAuthService(store *store.Store, userService UserService, jwtAuthenticator *jwt.JWT, authConfig config.AuthConfig) AuthService {
 	return &authServiceImpl{
 		store,
 		userService,
 		jwtAuthenticator,
+		authConfig,
 	}
 }
 
 func (s *authServiceImpl) Login(email, password string) (*responsesdto.AuthResponse, error) {
-	existingUser, err := s.store.Users.GetByEmail(email)
+	user, err := s.store.Users.GetByEmail(email)
 	if err != nil {
 		return nil, err
 	}
 
-	if existingUser == nil {
+	if user == nil {
 		return nil, errors.New("invalid user or password")
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, errors.New("invalid user or password")
 	}
 
-	tokens, err := s.jwtAuthenticator.GenerateTokenPair(existingUser.ID, existingUser.Email, "")
+	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
+	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
+	accessToken, err := s.jwtAuthenticator.GenToken(user.ID, accessExpiration)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := s.jwtAuthenticator.GenToken(user.ID, refreshExpiration)
 	if err != nil {
 		return nil, err
 	}
 
 	authResponse := &responsesdto.AuthResponse{
-		User: *existingUser,
+		User: *user,
 		Tokens: responsesdto.AuthTokensResponse{
-			AccessToken:  tokens.AccessToken,
-			RefreshToken: tokens.RefreshToken,
-			ExpiresAt:    tokens.ExpiresAt.Unix(),
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			ExpiresAt:    refreshExpiration.Unix(),
 		},
 	}
 
@@ -71,7 +82,14 @@ func (s *authServiceImpl) Register(user *requestsdto.RegisterUserRequest) (*resp
 		return nil, err
 	}
 
-	tokens, err := s.jwtAuthenticator.GenerateTokenPair(createdUser.ID, createdUser.Email, "")
+	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
+	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
+	accessToken, err := s.jwtAuthenticator.GenToken(createdUser.ID, accessExpiration)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := s.jwtAuthenticator.GenToken(createdUser.ID, refreshExpiration)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +97,9 @@ func (s *authServiceImpl) Register(user *requestsdto.RegisterUserRequest) (*resp
 	authResponse := &responsesdto.AuthResponse{
 		User: *createdUser,
 		Tokens: responsesdto.AuthTokensResponse{
-			AccessToken:  tokens.AccessToken,
-			RefreshToken: tokens.RefreshToken,
-			ExpiresAt:    tokens.ExpiresAt.Unix(),
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			ExpiresAt:    refreshExpiration.Unix(),
 		},
 	}
 

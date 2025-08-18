@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
+	"github.com/imlargo/go-api-template/pkg/jwt"
 )
 
-func AuthTokenMiddleware(jwtAuthenticator ports.JWTAuthenticator) gin.HandlerFunc {
+func AuthTokenMiddleware(jwtAuthenticator *jwt.JWT) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 
@@ -32,7 +32,7 @@ func AuthTokenMiddleware(jwtAuthenticator ports.JWTAuthenticator) gin.HandlerFun
 			return
 		}
 
-		tokenData, err := jwtAuthenticator.ValidateToken(token, false)
+		tokenData, err := jwtAuthenticator.ParseToken(token)
 		if err != nil {
 			ctx.Abort()
 			responses.ErrorUnauthorized(ctx, err.Error())
