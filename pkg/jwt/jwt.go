@@ -19,7 +19,13 @@ func NewJwt(cfg Config) *JWT {
 	return &JWT{config: cfg}
 }
 
-func (j *JWT) GenToken(userID uint, expiresAt time.Time) (string, error) {
+func (j *JWT) GenerateToken(userID uint, expiresAt time.Time) (string, error) {
+
+	var requiredAudience = []string{}
+	if j.config.Audience != "" {
+		requiredAudience = append(requiredAudience, j.config.Audience)
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -29,7 +35,7 @@ func (j *JWT) GenToken(userID uint, expiresAt time.Time) (string, error) {
 			Issuer:    j.config.Issuer,
 			Subject:   strconv.Itoa(int(userID)),
 			ID:        uuid.New().String(),
-			Audience:  jwt.ClaimStrings([]string{j.config.Audience}),
+			Audience:  jwt.ClaimStrings(requiredAudience),
 		},
 	})
 

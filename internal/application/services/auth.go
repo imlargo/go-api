@@ -53,12 +53,12 @@ func (s *authServiceImpl) Login(email, password string) (*responsesdto.AuthRespo
 
 	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
 	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
-	accessToken, err := s.jwtAuthenticator.GenToken(user.ID, accessExpiration)
+	accessToken, err := s.jwtAuthenticator.GenerateToken(user.ID, accessExpiration)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.jwtAuthenticator.GenToken(user.ID, refreshExpiration)
+	refreshToken, err := s.jwtAuthenticator.GenerateToken(user.ID, refreshExpiration)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +84,12 @@ func (s *authServiceImpl) Register(user *requestsdto.RegisterUserRequest) (*resp
 
 	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
 	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
-	accessToken, err := s.jwtAuthenticator.GenToken(createdUser.ID, accessExpiration)
+	accessToken, err := s.jwtAuthenticator.GenerateToken(createdUser.ID, accessExpiration)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.jwtAuthenticator.GenToken(createdUser.ID, refreshExpiration)
+	refreshToken, err := s.jwtAuthenticator.GenerateToken(createdUser.ID, refreshExpiration)
 	if err != nil {
 		return nil, err
 	}
