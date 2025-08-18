@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/imlargo/go-api-template/internal/config"
-	postgres "github.com/imlargo/go-api-template/internal/infrastructure/database"
+	postgres "github.com/imlargo/go-api-template/internal/database"
 )
 
 func main() {

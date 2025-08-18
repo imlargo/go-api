@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/infrastructure/cache"
+	"github.com/imlargo/go-api-template/internal/cache"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/pkg/kv"
 	"gorm.io/gorm"
