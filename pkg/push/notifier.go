@@ -7,7 +7,7 @@ import (
 )
 
 type PushNotifier interface {
-	Send(subscription *webpush.Subscription, payload interface{}) error
+	Send(subscription *Subscription, payload interface{}) error
 }
 
 type pushNotifier struct {
@@ -22,22 +22,30 @@ func NewPushNotifier(vapidPrivateKey string, vapidPublicKey string) PushNotifier
 	}
 }
 
-func (p *pushNotifier) Send(subscription *webpush.Subscription, payload interface{}) error {
+func (p *pushNotifier) Send(subscription *Subscription, payload interface{}) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}
 
-	resp, err := webpush.SendNotification(payloadBytes, subscription, &webpush.Options{
+	sub := &webpush.Subscription{
+		Endpoint: subscription.Endpoint,
+		Keys: webpush.Keys{
+			P256dh: subscription.P256dh,
+			Auth:   subscription.Auth,
+		},
+	}
+
+	resp, err := webpush.SendNotification(payloadBytes, sub, &webpush.Options{
 		Subscriber:      "",
 		VAPIDPublicKey:  p.vapidPublicKey,
 		VAPIDPrivateKey: p.vapidPrivateKey,
 		TTL:             30,
 	})
-
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
 	return nil
 }

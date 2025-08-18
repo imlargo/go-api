@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/SherClockHolmes/webpush-go"
 	"github.com/imlargo/go-api-template/internal/domain/enums"
 	"github.com/imlargo/go-api-template/internal/domain/models"
 	"github.com/imlargo/go-api-template/internal/store"
@@ -88,21 +87,17 @@ func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models
 
 	if err == nil {
 		for _, subscription := range subs {
-			webpushSub := &webpush.Subscription{
-				Endpoint: subscription.Endpoint,
-				Keys: webpush.Keys{
-					P256dh: subscription.P256dh,
-					Auth:   subscription.Auth,
-				},
-			}
-
 			notification := map[string]interface{}{
 				"title":    notification.Title,
 				"message":  notification.Description,
 				"category": notification.Category,
 			}
 
-			err = d.Push.Send(webpushSub, notification)
+			err = d.Push.Send(&push.Subscription{
+				Endpoint: subscription.Endpoint,
+				P256dh:   subscription.P256dh,
+				Auth:     subscription.Auth,
+			}, notification)
 			if err != nil {
 				d.store.PushSubscriptions.Delete(subscription.ID)
 				continue
