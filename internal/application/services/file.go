@@ -13,9 +13,9 @@ import (
 	"github.com/google/uuid"
 	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
 	"github.com/imlargo/go-api-template/internal/domain/models"
-	"github.com/imlargo/go-api-template/internal/shared/utils"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/storage"
+	utils "github.com/imlargo/go-api-template/pkg/tools"
 )
 
 type FileService interface {
