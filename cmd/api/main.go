@@ -13,6 +13,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/infrastructure/metrics"
 	"github.com/imlargo/go-api-template/internal/store"
 	cachekey "github.com/imlargo/go-api-template/pkg/keybuilder"
+	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/storage"
 )
@@ -63,8 +64,8 @@ func main() {
 	}
 
 	// Cache
-	cacheRepository := redis.NewRedisCache(redisClient)
-	cacheService := cache.NewCacheService(cacheRepository)
+	cacheProvider := redis.NewRedisCache(redisClient)
+	cacheService := kv.NewKeyValueStore(cacheProvider)
 	cacheKeys := cache.NewCacheKeys(cachekey.NewBuilder("api", "v1"))
 
 	// Repositories
