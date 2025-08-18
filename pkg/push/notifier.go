@@ -4,22 +4,25 @@ import (
 	"encoding/json"
 
 	"github.com/SherClockHolmes/webpush-go"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
 )
 
-type PushNotifier struct {
+type PushNotifier interface {
+	SendNotification(subscription *webpush.Subscription, payload interface{}) error
+}
+
+type pushNotifier struct {
 	vapidPrivateKey string
 	vapidPublicKey  string
 }
 
-func NewPushNotifier(vapidPrivateKey string, vapidPublicKey string) ports.PushNotifier {
-	return &PushNotifier{
+func NewPushNotifier(vapidPrivateKey string, vapidPublicKey string) PushNotifier {
+	return &pushNotifier{
 		vapidPrivateKey: vapidPrivateKey,
 		vapidPublicKey:  vapidPublicKey,
 	}
 }
 
-func (p *PushNotifier) SendNotification(subscription *webpush.Subscription, payload interface{}) error {
+func (p *pushNotifier) SendNotification(subscription *webpush.Subscription, payload interface{}) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return err

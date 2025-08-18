@@ -9,8 +9,8 @@ import (
 	"github.com/SherClockHolmes/webpush-go"
 	"github.com/imlargo/go-api-template/internal/domain/enums"
 	"github.com/imlargo/go-api-template/internal/domain/models"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
 	"github.com/imlargo/go-api-template/internal/store"
+	"github.com/imlargo/go-api-template/pkg/push"
 	"github.com/imlargo/go-api-template/pkg/sse"
 )
 
@@ -35,10 +35,10 @@ type NotificationService interface {
 type notificationServiceImpl struct {
 	store *store.Store
 	SSE   sse.SSEManager
-	Push  ports.PushNotifier
+	Push  push.PushNotifier
 }
 
-func NewNotificationService(store *store.Store, sse sse.SSEManager, push ports.PushNotifier) NotificationService {
+func NewNotificationService(store *store.Store, sse sse.SSEManager, push push.PushNotifier) NotificationService {
 	return &notificationServiceImpl{
 		store: store,
 		SSE:   sse,

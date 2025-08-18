@@ -11,7 +11,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/presentation/http/middleware"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
-	"github.com/imlargo/go-api-template/pkg/notification/push"
+	"github.com/imlargo/go-api-template/pkg/push"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/sse"
 	"github.com/imlargo/go-api-template/pkg/storage"
