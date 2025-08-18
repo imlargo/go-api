@@ -4,27 +4,24 @@ import (
 	"sync"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/config"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
 	"golang.org/x/time/rate"
 )
 
-type TokenBucketLimiter struct {
+type tokenBucketLimiter struct {
 	sync.RWMutex
-	config  config.RateLimiterConfig
-	entries map[string]*LimiterEntry
+	config  Config
+	entries map[string]*tblEntry
 }
 
-type LimiterEntry struct {
+type tblEntry struct {
 	Limiter  *rate.Limiter
 	LastSeen time.Time
 }
 
-func NewTokenBucketLimiter(cfg config.RateLimiterConfig) ports.RateLimiter {
-
-	rl := &TokenBucketLimiter{
+func NewTokenBucketLimiter(cfg Config) RateLimiter {
+	rl := &tokenBucketLimiter{
 		config:  cfg,
-		entries: make(map[string]*LimiterEntry),
+		entries: make(map[string]*tblEntry),
 	}
 
 	go rl.cleanUpEntries()
@@ -32,7 +29,7 @@ func NewTokenBucketLimiter(cfg config.RateLimiterConfig) ports.RateLimiter {
 	return rl
 }
 
-func (rl *TokenBucketLimiter) getEntry(key string) *LimiterEntry {
+func (rl *tokenBucketLimiter) getEntry(key string) *tblEntry {
 	rl.Lock()
 	_, exists := rl.entries[key]
 	rl.Unlock()
@@ -41,7 +38,7 @@ func (rl *TokenBucketLimiter) getEntry(key string) *LimiterEntry {
 		limiter := rate.NewLimiter(rate.Every(rl.config.TimeFrame), rl.config.RequestsPerTimeFrame)
 		rl.Lock()
 
-		rl.entries[key] = &LimiterEntry{
+		rl.entries[key] = &tblEntry{
 			Limiter:  limiter,
 			LastSeen: time.Now(),
 		}
@@ -55,7 +52,7 @@ func (rl *TokenBucketLimiter) getEntry(key string) *LimiterEntry {
 	return entry
 }
 
-func (rl *TokenBucketLimiter) Allow(key string) (bool, float64) {
+func (rl *tokenBucketLimiter) Allow(key string) (bool, float64) {
 	entry := rl.getEntry(key)
 
 	allowed := entry.Limiter.Allow()
@@ -64,7 +61,7 @@ func (rl *TokenBucketLimiter) Allow(key string) (bool, float64) {
 	return allowed, tokens
 }
 
-func (rl *TokenBucketLimiter) cleanUpEntries() {
+func (rl *tokenBucketLimiter) cleanUpEntries() {
 	maxAge := 3 * time.Minute
 	timeInterval := time.Minute
 

@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
+	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 )
 
-func NewRateLimiterMiddleware(rl ports.RateLimiter) gin.HandlerFunc {
+func NewRateLimiterMiddleware(rl ratelimiter.RateLimiter) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ip := ctx.ClientIP()
 		allow, retryAfter := rl.Allow(ip)

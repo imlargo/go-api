@@ -74,7 +74,10 @@ func main() {
 	if cfg.RateLimiter.Enabled {
 		log.Printf("Initializing rate limiter with config: %s request every %.2f seconds", strconv.Itoa(cfg.RateLimiter.RequestsPerTimeFrame), cfg.RateLimiter.TimeFrame.Seconds())
 	}
-	rateLimiter := ratelimiter.NewTokenBucketLimiter(cfg.RateLimiter)
+	rateLimiter := ratelimiter.NewTokenBucketLimiter(ratelimiter.Config{
+		RequestsPerTimeFrame: cfg.RateLimiter.RequestsPerTimeFrame,
+		TimeFrame:            cfg.RateLimiter.TimeFrame,
+	})
 
 	// Metrics
 	metricsService := metrics.NewPrometheusMetrics()
