@@ -119,7 +119,7 @@ func (h *FileControllerImpl) DeleteFile(c *gin.Context) {
 // @Param			fileID	path	int				true	"File ID"
 // @Accept			json
 // @Produce		json
-// @Param		payload	body	dto.GetPresignedURLRequest				true	"Expiry time in minutes for the presigned URL"
+// @Param		payload	body	dto.CreatePresignedUrl				true	"Expiry time in minutes for the presigned URL"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth

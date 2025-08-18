@@ -29,9 +29,9 @@ func NewAuthController(authService services.AuthService) AuthController {
 // @Description	Login user with email and password
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	dto.LoginUserRequest	true	"Login user request payload"
+// @Param		payload	body	dto.LoginUser	true	"Login user request payload"
 // @Produce		json
-// @Success		200	{object}	dto.AuthResponse	"User logged in successfully"
+// @Success		200	{object}	dto.UserAuthResponse	"User logged in successfully"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
@@ -56,9 +56,9 @@ func (a *authController) Login(c *gin.Context) {
 // @Description	Register a new user with email, password, and other details
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	dto.RegisterUserRequest	true	"Register user request payload"
+// @Param		payload	body	dto.RegisterUser	true	"Register user request payload"
 // @Produce		json
-// @Success		200	{object}	dto.AuthResponse	"User registered successfully
+// @Success		200	{object}	dto.UserAuthResponse	"User registered successfully
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
