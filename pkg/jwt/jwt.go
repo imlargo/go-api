@@ -4,126 +4,66 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/imlargo/go-api-template/internal/shared/models"
-	"github.com/imlargo/go-api-template/internal/shared/ports"
 )
 
-type JWTAuthenticatorImpl struct {
-	config *Config
+type JWT struct {
+	config Config
 }
 
-func NewJWTAuthenticator(cfg Config) ports.JWTAuthenticator {
-	return &JWTAuthenticatorImpl{config: &cfg}
+func NewJWTAuthenticator(cfg Config) *JWT {
+	return &JWT{config: cfg}
 }
 
-func (a *JWTAuthenticatorImpl) createToken(claims jwt.Claims, expiration time.Duration) (string, time.Time, error) {
-	expiryTime := time.Now().Add(expiration)
+func (j *JWT) GenToken(userID uint, expiresAt time.Time) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    j.config.Issuer,
+			Subject:   strconv.Itoa(int(userID)),
+			ID:        uuid.New().String(),
+			Audience:  jwt.ClaimStrings([]string{j.config.Audience}),
+		},
+	})
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString([]byte(a.config.Secret))
+	tokenString, err := token.SignedString([]byte(j.config.Secret))
 	if err != nil {
-		return "", time.Time{}, err
+		return "", err
+	}
+	return tokenString, nil
+}
+
+func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+	if strings.TrimSpace(tokenString) == "" {
+		return nil, errors.New("token is empty")
 	}
 
-	return tokenString, expiryTime, nil
-}
-
-func (a *JWTAuthenticatorImpl) ValidateToken(tokenString string, isRefreshToken bool) (*models.CustomClaims, error) {
-
-	token, err := jwt.ParseWithClaims(tokenString, &models.CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method %v", t.Header["alg"])
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method %v", token.Header["alg"])
 		}
 
-		return []byte(a.config.Secret), nil
+		return []byte(j.config.Secret), nil
 	},
 		jwt.WithExpirationRequired(),
-		jwt.WithIssuer(a.config.Issuer),
+		jwt.WithIssuer(j.config.Issuer),
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
 	)
-
 	if err != nil {
-		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, errors.New("token expired")
-		}
-
-		return nil, fmt.Errorf("error parsing token: %w", err)
+		return nil, err
 	}
 
-	if !token.Valid {
-		return nil, errors.New("invalid token")
-	}
-
-	claims, ok := token.Claims.(*models.CustomClaims)
-	if !ok {
-		return nil, errors.New("could not extract claims")
-	}
-
-	aud := claims.Audience[0]
-	if isRefreshToken {
-		if aud != a.config.Audience+"/refresh" {
-			return nil, errors.New("invalid audience for refresh token")
-		}
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return claims, nil
 	} else {
-		if aud != a.config.Audience {
-			return nil, errors.New("invalid audience")
-		}
+		return nil, err
 	}
-
-	return claims, nil
-}
-
-func (a *JWTAuthenticatorImpl) GenerateTokenPair(userID uint, userEmail string, role string) (models.TokenPair, error) {
-
-	accessToken, accessExpiry, err := a.createToken(models.CustomClaims{
-		UserID: userID,
-		Email:  userEmail,
-		Role:   role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(a.config.TokenExpiration)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    a.config.Issuer,
-			Subject:   strconv.Itoa(int(userID)),
-			ID:        generateUniqueTokenID(),
-			Audience:  jwt.ClaimStrings([]string{a.config.Audience}),
-		},
-	}, a.config.TokenExpiration)
-	if err != nil {
-		return models.TokenPair{}, err
-	}
-
-	refreshToken, _, err := a.createToken(models.CustomClaims{
-		UserID: userID,
-		Email:  userEmail,
-		Role:   role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(a.config.RefreshExpiration)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    a.config.Issuer,
-			Subject:   strconv.Itoa(int(userID)),
-			ID:        generateUniqueTokenID(),
-			Audience:  jwt.ClaimStrings([]string{a.config.Audience + "/refresh"}),
-		},
-	}, a.config.RefreshExpiration)
-
-	if err != nil {
-		return models.TokenPair{}, err
-	}
-
-	return models.TokenPair{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiresAt:    accessExpiry,
-	}, nil
-}
-
-func generateUniqueTokenID() string {
-	return uuid.New().String()
 }
