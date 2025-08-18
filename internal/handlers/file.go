@@ -48,7 +48,7 @@ func (h *FileControllerImpl) UploadFile(c *gin.Context) {
 		responses.ErrorBadRequest(c, "Invalid file: "+err.Error())
 	}
 
-	result, err := h.fileService.UploadFileFromMultipart(file)
+	result, err := h.fileService.UploadFromMultipart(file)
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, "Failed to upload file: "+err.Error())
 		return

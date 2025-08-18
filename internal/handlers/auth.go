@@ -94,7 +94,7 @@ func (a *authController) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	user, err := a.authService.GetUserInfo(userID.(uint))
+	user, err := a.authService.GetUser(userID.(uint))
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, err.Error())
 		return

@@ -19,9 +19,9 @@ import (
 )
 
 type FileService interface {
-	UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error)
-	UploadFileFromReader(file *storage.File) (*models.File, error)
-	UploadFileFromUrl(url string) (*models.File, error)
+	UploadFromMultipart(file *multipart.FileHeader) (*models.File, error)
+	UploadFromReader(file *storage.File) (*models.File, error)
+	UploadFromUrl(url string) (*models.File, error)
 	GetFile(id uint) (*models.File, error)
 	DeleteFile(id uint) error
 	GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURL, error)
@@ -51,16 +51,16 @@ func NewFileService(
 	}
 }
 
-func (u *fileServiceImpl) UploadFileFromUrl(url string) (*models.File, error) {
+func (u *fileServiceImpl) UploadFromUrl(url string) (*models.File, error) {
 	file, err := u.createFileFromUrl(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create file from URL: %w", err)
 	}
 
-	return u.UploadFileFromReader(file)
+	return u.UploadFromReader(file)
 }
 
-func (u *fileServiceImpl) UploadFileFromReader(file *storage.File) (*models.File, error) {
+func (u *fileServiceImpl) UploadFromReader(file *storage.File) (*models.File, error) {
 
 	if file.Size > u.maxFileSize {
 		return nil, fmt.Errorf("file size exceeds limit of 1GB")
@@ -102,7 +102,7 @@ func (u *fileServiceImpl) UploadFileFromReader(file *storage.File) (*models.File
 	return createdFile, nil
 }
 
-func (u *fileServiceImpl) UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error) {
+func (u *fileServiceImpl) UploadFromMultipart(file *multipart.FileHeader) (*models.File, error) {
 	if file.Size > u.maxFileSize {
 		return nil, fmt.Errorf("file size exceeds limit of 1GB")
 	}

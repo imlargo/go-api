@@ -17,7 +17,7 @@ type AuthService interface {
 	Register(user *dto.RegisterUser) (*dto.UserAuthResponse, error)
 	Logout(userID uint) error
 	RefreshToken(userID uint, refreshToken string) (*dto.AuthTokens, error)
-	GetUserInfo(userID uint) (*models.User, error)
+	GetUser(userID uint) (*models.User, error)
 }
 
 type authServiceImpl struct {
@@ -113,7 +113,7 @@ func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*dto.A
 	return nil, nil
 }
 
-func (s *authServiceImpl) GetUserInfo(userID uint) (*models.User, error) {
+func (s *authServiceImpl) GetUser(userID uint) (*models.User, error) {
 	if userID == 0 {
 		return nil, errors.New("user ID cannot be zero")
 	}
