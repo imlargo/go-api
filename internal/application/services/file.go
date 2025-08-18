@@ -15,7 +15,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/domain/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/storage"
-	utils "github.com/imlargo/go-api-template/pkg/tools"
+	"github.com/imlargo/go-api-template/pkg/utils"
 )
 
 type FileService interface {
