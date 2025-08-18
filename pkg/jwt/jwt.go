@@ -15,7 +15,7 @@ type JWT struct {
 	config Config
 }
 
-func NewJWTAuthenticator(cfg Config) *JWT {
+func NewJwt(cfg Config) *JWT {
 	return &JWT{config: cfg}
 }
 
