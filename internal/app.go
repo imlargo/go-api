@@ -17,6 +17,7 @@ import (
 	"github.com/imlargo/go-api-template/pkg/sse"
 	"github.com/imlargo/go-api-template/pkg/storage"
 	"github.com/imlargo/go-api-template/pkg/utils"
+	"go.uber.org/zap"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -31,6 +32,7 @@ type Application struct {
 	Cache       kv.KeyValueStore
 	CacheKeys   cache.CacheKeys
 	RateLimiter ratelimiter.RateLimiter
+	Logger      *zap.SugaredLogger
 	Router      *gin.Engine
 }
 
