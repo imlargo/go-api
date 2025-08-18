@@ -7,7 +7,7 @@ import (
 	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
 	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
 	"github.com/imlargo/go-api-template/internal/config"
-	"github.com/imlargo/go-api-template/internal/domain/models"
+	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"

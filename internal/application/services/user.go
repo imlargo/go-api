@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
-	"github.com/imlargo/go-api-template/internal/domain/models"
+	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"golang.org/x/crypto/bcrypt"
 )

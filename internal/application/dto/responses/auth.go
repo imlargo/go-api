@@ -1,6 +1,6 @@
 package responsesdto
 
-import "github.com/imlargo/go-api-template/internal/domain/models"
+import "github.com/imlargo/go-api-template/internal/models"
 
 type AuthTokensResponse struct {
 	AccessToken  string `json:"access_token"`

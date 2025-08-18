@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/domain/enums"
-	"github.com/imlargo/go-api-template/internal/domain/models"
+	"github.com/imlargo/go-api-template/internal/enums"
+	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/push"
 	"github.com/imlargo/go-api-template/pkg/sse"

@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/domain/models"
 	"github.com/imlargo/go-api-template/internal/infrastructure/cache"
+	"github.com/imlargo/go-api-template/internal/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

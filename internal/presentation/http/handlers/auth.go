@@ -5,7 +5,7 @@ import (
 	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
 	_ "github.com/imlargo/go-api-template/internal/application/dto/responses"
 	"github.com/imlargo/go-api-template/internal/application/services"
-	_ "github.com/imlargo/go-api-template/internal/domain/models"
+	_ "github.com/imlargo/go-api-template/internal/models"
 
 	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
 )

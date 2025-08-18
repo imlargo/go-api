@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
-	"github.com/imlargo/go-api-template/internal/domain/models"
+	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/storage"
 	"github.com/imlargo/go-api-template/pkg/utils"
