@@ -12,17 +12,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
-	appconfig "github.com/imlargo/go-api-template/internal/config"
-	"github.com/imlargo/go-api-template/internal/domain/models"
 )
 
 type r2Storage struct {
 	client *s3.Client
-	config appconfig.StorageConfig
+	config StorageConfig
 }
 
-func newR2Client(r2Config appconfig.StorageConfig) (*s3.Client, error) {
+func newR2Client(r2Config StorageConfig) (*s3.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2Config.AccessKeyID, r2Config.SecretAccessKey, "")),
 		config.WithRegion("auto"),
@@ -44,7 +41,7 @@ func newR2Client(r2Config appconfig.StorageConfig) (*s3.Client, error) {
 	return client, nil
 }
 
-func NewR2StorageService(config appconfig.StorageConfig) (StorageAdapter, error) {
+func NewR2Storage(config StorageConfig) (FileStorage, error) {
 	client, err := newR2Client(config)
 	if err != nil {
 		return nil, err
@@ -56,7 +53,7 @@ func NewR2StorageService(config appconfig.StorageConfig) (StorageAdapter, error)
 	}, nil
 }
 
-func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*models.File, error) {
+func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*FileResult, error) {
 	ctx := context.Background()
 
 	// Prepare the put object input
@@ -75,8 +72,8 @@ func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, siz
 	}
 
 	// Create the file model
-	file := &models.File{
-		Path:        key,
+	file := &FileResult{
+		Key:         key,
 		Size:        size,
 		ContentType: contentType,
 		Etag:        clearStringQuotes(aws.ToString(result.ETag)),
@@ -228,7 +225,7 @@ func clearStringQuotes(s string) string {
 	return quotesRegex.ReplaceAllString(s, "")
 }
 
-func (s *r2Storage) GetFileForDownload(key string) (*responsesdto.FileDownloadDto, error) {
+func (s *r2Storage) GetFileForDownload(key string) (*FileDownload, error) {
 	ctx := context.Background()
 
 	input := &s3.GetObjectInput{
@@ -253,7 +250,7 @@ func (s *r2Storage) GetFileForDownload(key string) (*responsesdto.FileDownloadDt
 		size = *result.ContentLength
 	}
 
-	return &responsesdto.FileDownloadDto{
+	return &FileDownload{
 		Content:     result.Body,
 		ContentType: contentType,
 		Size:        size,

@@ -11,10 +11,10 @@ import (
 	"github.com/imlargo/go-api-template/internal/infrastructure/cache/redis"
 	postgres "github.com/imlargo/go-api-template/internal/infrastructure/database"
 	"github.com/imlargo/go-api-template/internal/infrastructure/metrics"
-	"github.com/imlargo/go-api-template/internal/infrastructure/storage"
 	"github.com/imlargo/go-api-template/internal/store"
 	cachekey "github.com/imlargo/go-api-template/pkg/keybuilder"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
+	"github.com/imlargo/go-api-template/pkg/storage"
 )
 
 // @title Go api
@@ -42,7 +42,14 @@ func main() {
 	}
 
 	// Storage
-	storage, err := storage.NewR2StorageService(cfg.Storage)
+	storage, err := storage.NewR2Storage(storage.StorageConfig{
+		BucketName:      cfg.Storage.BucketName,
+		AccountID:       cfg.Storage.AccountID,
+		AccessKeyID:     cfg.Storage.AccessKeyID,
+		SecretAccessKey: cfg.Storage.SecretAccessKey,
+		PublicDomain:    cfg.Storage.PublicDomain,
+		UsePublicURL:    cfg.Storage.UsePublicURL,
+	})
 	if err != nil {
 		log.Fatal("Could not initialize storage service: ", err)
 		return

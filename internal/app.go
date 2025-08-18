@@ -7,7 +7,6 @@ import (
 	"github.com/imlargo/go-api-template/internal/config"
 	"github.com/imlargo/go-api-template/internal/infrastructure/cache"
 	"github.com/imlargo/go-api-template/internal/infrastructure/metrics"
-	"github.com/imlargo/go-api-template/internal/infrastructure/storage"
 	"github.com/imlargo/go-api-template/internal/presentation/http/handlers"
 	"github.com/imlargo/go-api-template/internal/presentation/http/middleware"
 	"github.com/imlargo/go-api-template/internal/shared/ports"
@@ -16,6 +15,7 @@ import (
 	"github.com/imlargo/go-api-template/pkg/auth/jwt"
 	"github.com/imlargo/go-api-template/pkg/notification/push"
 	"github.com/imlargo/go-api-template/pkg/notification/sse"
+	"github.com/imlargo/go-api-template/pkg/storage"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -25,7 +25,7 @@ import (
 type Application struct {
 	Config      config.AppConfig
 	Store       *store.Store
-	Storage     storage.StorageAdapter
+	Storage     storage.FileStorage
 	Metrics     metrics.MetricsService
 	Cache       cache.CacheService
 	CacheKeys   cache.CacheKeys

@@ -13,26 +13,25 @@ import (
 	"github.com/google/uuid"
 	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
 	"github.com/imlargo/go-api-template/internal/domain/models"
-	"github.com/imlargo/go-api-template/internal/infrastructure/storage"
-	sharedmodels "github.com/imlargo/go-api-template/internal/shared/models"
 	"github.com/imlargo/go-api-template/internal/shared/utils"
 	"github.com/imlargo/go-api-template/internal/store"
+	"github.com/imlargo/go-api-template/pkg/storage"
 )
 
 type FileService interface {
 	UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error)
-	UploadFileFromReader(file *sharedmodels.InternalFile) (*models.File, error)
+	UploadFileFromReader(file *storage.File) (*models.File, error)
 	UploadFileFromUrl(url string) (*models.File, error)
 	GetFile(id uint) (*models.File, error)
 	DeleteFile(id uint) error
 	GetPresignedURL(fileID uint, expiryMins int) (*responsesdto.PresignedURLResponse, error)
 	BulkDeleteFiles(fileIDs []uint) error
-	DownloadFile(fileID uint) (*models.File, *responsesdto.FileDownloadDto, error)
+	DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error)
 }
 
 type fileServiceImpl struct {
 	store              *store.Store
-	storageService     storage.StorageAdapter
+	storageService     storage.FileStorage
 	defaultBucket      string
 	maxFileSize        int64
 	urlDownloadTimeout time.Duration
@@ -40,7 +39,7 @@ type fileServiceImpl struct {
 
 func NewFileService(
 	store *store.Store,
-	storageService storage.StorageAdapter,
+	storageService storage.FileStorage,
 	defaultBucket string,
 ) FileService {
 	return &fileServiceImpl{
@@ -61,7 +60,7 @@ func (u *fileServiceImpl) UploadFileFromUrl(url string) (*models.File, error) {
 	return u.UploadFileFromReader(file)
 }
 
-func (u *fileServiceImpl) UploadFileFromReader(file *sharedmodels.InternalFile) (*models.File, error) {
+func (u *fileServiceImpl) UploadFileFromReader(file *storage.File) (*models.File, error) {
 
 	if file.Size > u.maxFileSize {
 		return nil, fmt.Errorf("file size exceeds limit of 1GB")
@@ -88,12 +87,19 @@ func (u *fileServiceImpl) UploadFileFromReader(file *sharedmodels.InternalFile) 
 		return nil, fmt.Errorf("failed to upload file to R2: %w", err)
 	}
 
-	if err := u.store.Files.Create(uploadResult); err != nil {
+	createdFile := &models.File{
+		ContentType: uploadResult.ContentType,
+		Size:        uploadResult.Size,
+		Etag:        uploadResult.Etag,
+		Path:        uploadResult.Key,
+		Url:         uploadResult.Url,
+	}
+	if err := u.store.Files.Create(createdFile); err != nil {
 		u.storageService.Delete(key)
 		return nil, fmt.Errorf("failed to save file record: %w", err)
 	}
 
-	return uploadResult, nil
+	return createdFile, nil
 }
 
 func (u *fileServiceImpl) UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error) {
@@ -130,12 +136,19 @@ func (u *fileServiceImpl) UploadFileFromMultipart(file *multipart.FileHeader) (*
 		return nil, fmt.Errorf("failed to upload file to R2: %w", err)
 	}
 
-	if err := u.store.Files.Create(uploadResult); err != nil {
+	createdFile := &models.File{
+		ContentType: uploadResult.ContentType,
+		Size:        uploadResult.Size,
+		Etag:        uploadResult.Etag,
+		Path:        uploadResult.Key,
+		Url:         uploadResult.Url,
+	}
+	if err := u.store.Files.Create(createdFile); err != nil {
 		u.storageService.Delete(key)
 		return nil, fmt.Errorf("failed to save file record: %w", err)
 	}
 
-	return uploadResult, nil
+	return createdFile, nil
 }
 
 func (u *fileServiceImpl) GetFile(id uint) (*models.File, error) {
@@ -187,7 +200,7 @@ func (u *fileServiceImpl) GetPresignedURL(fileID uint, expiryMins int) (*respons
 	}, nil
 }
 
-func (u *fileServiceImpl) createFileFromUrl(urlStr string) (*sharedmodels.InternalFile, error) {
+func (u *fileServiceImpl) createFileFromUrl(urlStr string) (*storage.File, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid URL: %w", err)
@@ -243,7 +256,7 @@ func (u *fileServiceImpl) createFileFromUrl(urlStr string) (*sharedmodels.Intern
 
 	filename := u.extractUrlFilename(urlStr, resp.Header.Get("Content-Disposition"), contentType)
 
-	return &sharedmodels.InternalFile{
+	return &storage.File{
 		Reader:      bytes.NewReader(data),
 		Filename:    filename,
 		Size:        int64(len(data)),
@@ -273,7 +286,7 @@ func (u *fileServiceImpl) BulkDeleteFiles(fileIDs []uint) error {
 	return nil
 }
 
-func (u *fileServiceImpl) DownloadFile(fileID uint) (*models.File, *responsesdto.FileDownloadDto, error) {
+func (u *fileServiceImpl) DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error) {
 
 	file, err := u.store.Files.GetByID(fileID)
 	if err != nil {
