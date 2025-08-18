@@ -102,7 +102,7 @@ func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models
 				"category": notification.Category,
 			}
 
-			err = d.Push.SendNotification(webpushSub, notification)
+			err = d.Push.Send(webpushSub, notification)
 			if err != nil {
 				d.store.PushSubscriptions.Delete(subscription.ID)
 				continue
