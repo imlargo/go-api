@@ -8,11 +8,11 @@ type UploadFileRequest struct {
 	File *multipart.FileHeader `form:"file" binding:"required"`
 }
 
-type GetPresignedURLRequest struct {
+type CreatePresignedUrl struct {
 	ExpiryMins int `json:"expiry_minutes,omitempty"`
 }
 
-type PresignedURLResponse struct {
+type PresignedURL struct {
 	Url       string `json:"url"`
 	ExpiresAt string `json:"expires_at"`
 }

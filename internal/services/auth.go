@@ -13,10 +13,10 @@ import (
 )
 
 type AuthService interface {
-	Login(email, password string) (*dto.AuthResponse, error)
-	Register(user *dto.RegisterUserRequest) (*dto.AuthResponse, error)
+	Login(email, password string) (*dto.UserAuthResponse, error)
+	Register(user *dto.RegisterUser) (*dto.UserAuthResponse, error)
 	Logout(userID uint) error
-	RefreshToken(userID uint, refreshToken string) (*dto.AuthTokensResponse, error)
+	RefreshToken(userID uint, refreshToken string) (*dto.AuthTokens, error)
 	GetUserInfo(userID uint) (*models.User, error)
 }
 
@@ -36,7 +36,7 @@ func NewAuthService(store *store.Store, userService UserService, jwtAuthenticato
 	}
 }
 
-func (s *authServiceImpl) Login(email, password string) (*dto.AuthResponse, error) {
+func (s *authServiceImpl) Login(email, password string) (*dto.UserAuthResponse, error) {
 	user, err := s.store.Users.GetByEmail(email)
 	if err != nil {
 		return nil, err
@@ -62,9 +62,9 @@ func (s *authServiceImpl) Login(email, password string) (*dto.AuthResponse, erro
 		return nil, err
 	}
 
-	authResponse := &dto.AuthResponse{
+	authResponse := &dto.UserAuthResponse{
 		User: *user,
-		Tokens: dto.AuthTokensResponse{
+		Tokens: dto.AuthTokens{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 			ExpiresAt:    refreshExpiration.Unix(),
@@ -74,7 +74,7 @@ func (s *authServiceImpl) Login(email, password string) (*dto.AuthResponse, erro
 	return authResponse, nil
 }
 
-func (s *authServiceImpl) Register(user *dto.RegisterUserRequest) (*dto.AuthResponse, error) {
+func (s *authServiceImpl) Register(user *dto.RegisterUser) (*dto.UserAuthResponse, error) {
 
 	createdUser, err := s.userService.CreateUser(user)
 	if err != nil {
@@ -93,9 +93,9 @@ func (s *authServiceImpl) Register(user *dto.RegisterUserRequest) (*dto.AuthResp
 		return nil, err
 	}
 
-	authResponse := &dto.AuthResponse{
+	authResponse := &dto.UserAuthResponse{
 		User: *createdUser,
-		Tokens: dto.AuthTokensResponse{
+		Tokens: dto.AuthTokens{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 			ExpiresAt:    refreshExpiration.Unix(),
@@ -109,7 +109,7 @@ func (s *authServiceImpl) Logout(userID uint) error {
 	return nil
 }
 
-func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*dto.AuthTokensResponse, error) {
+func (s *authServiceImpl) RefreshToken(userID uint, refreshToken string) (*dto.AuthTokens, error) {
 	return nil, nil
 }
 

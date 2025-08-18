@@ -132,7 +132,7 @@ func (h *FileControllerImpl) GetPresignedURL(c *gin.Context) {
 	}
 
 	// Bind the request payload
-	var payload dto.GetPresignedURLRequest
+	var payload dto.CreatePresignedUrl
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request data: "+err.Error())
 		return

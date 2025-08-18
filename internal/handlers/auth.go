@@ -36,7 +36,7 @@ func NewAuthController(authService services.AuthService) AuthController {
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
 func (a *authController) Login(c *gin.Context) {
-	var payload dto.LoginUserRequest
+	var payload dto.LoginUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return
@@ -63,7 +63,7 @@ func (a *authController) Login(c *gin.Context) {
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
 func (a *authController) Register(c *gin.Context) {
-	var payload dto.RegisterUserRequest
+	var payload dto.RegisterUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return
