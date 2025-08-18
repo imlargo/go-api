@@ -2,7 +2,7 @@ package jwt
 
 import "time"
 
-type JWTConfig struct {
+type Config struct {
 	Secret            string
 	Issuer            string
 	Audience          string

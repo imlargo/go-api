@@ -13,10 +13,10 @@ import (
 )
 
 type JWTAuthenticatorImpl struct {
-	config *JWTConfig
+	config *Config
 }
 
-func NewJWTAuthenticator(cfg JWTConfig) ports.JWTAuthenticator {
+func NewJWTAuthenticator(cfg Config) ports.JWTAuthenticator {
 	return &JWTAuthenticatorImpl{config: &cfg}
 }
 

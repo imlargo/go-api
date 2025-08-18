@@ -35,7 +35,7 @@ type Application struct {
 
 func (app *Application) Mount() {
 
-	jwtAuthenticator := jwt.NewJWTAuthenticator(jwt.JWTConfig{
+	jwtAuthenticator := jwt.NewJWTAuthenticator(jwt.Config{
 		Secret:            app.Config.Auth.JwtSecret,
 		Issuer:            app.Config.Auth.JwtIssuer,
 		Audience:          app.Config.Auth.JwtAudience,
