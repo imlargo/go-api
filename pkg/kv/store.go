@@ -1,4 +1,4 @@
-package cache
+package kv
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type CacheService interface {
+type KeyValueStore interface {
 	Set(key string, value interface{}, expiration time.Duration) error
 	Delete(key string) error
 	Exists(key string) (bool, error)
@@ -20,38 +20,38 @@ type CacheService interface {
 	GetJSON(key string, dest interface{}) error
 }
 
-type cacheServiceImpl struct {
-	cacheRepository CacheRepository
+type keyValueStore struct {
+	provider KvProvider
 }
 
-func NewCacheService(cacheRepository CacheRepository) CacheService {
-	return &cacheServiceImpl{
-		cacheRepository: cacheRepository,
+func NewKeyValueStore(provider KvProvider) KeyValueStore {
+	return &keyValueStore{
+		provider: provider,
 	}
 }
 
-func (s *cacheServiceImpl) Set(key string, value interface{}, expiration time.Duration) error {
-	return s.cacheRepository.Set(key, value, expiration)
+func (s *keyValueStore) Set(key string, value interface{}, expiration time.Duration) error {
+	return s.provider.Set(key, value, expiration)
 }
 
-func (s *cacheServiceImpl) Delete(key string) error {
-	return s.cacheRepository.Delete(key)
+func (s *keyValueStore) Delete(key string) error {
+	return s.provider.Delete(key)
 }
 
-func (s *cacheServiceImpl) Exists(key string) (bool, error) {
-	return s.cacheRepository.Exists(key)
+func (s *keyValueStore) Exists(key string) (bool, error) {
+	return s.provider.Exists(key)
 }
 
-func (s *cacheServiceImpl) Ping() error {
-	return s.cacheRepository.Ping()
+func (s *keyValueStore) Ping() error {
+	return s.provider.Ping()
 }
 
-func (s *cacheServiceImpl) GetString(key string) (string, error) {
-	return s.cacheRepository.Get(key)
+func (s *keyValueStore) GetString(key string) (string, error) {
+	return s.provider.Get(key)
 }
 
-func (s *cacheServiceImpl) GetInt64(key string) (int64, error) {
-	val, err := s.cacheRepository.Get(key)
+func (s *keyValueStore) GetInt64(key string) (int64, error) {
+	val, err := s.provider.Get(key)
 	if err != nil {
 		return 0, err
 	}
@@ -68,8 +68,8 @@ func (s *cacheServiceImpl) GetInt64(key string) (int64, error) {
 	return result, nil
 }
 
-func (s *cacheServiceImpl) GetFloat64(key string) (float64, error) {
-	val, err := s.cacheRepository.Get(key)
+func (s *keyValueStore) GetFloat64(key string) (float64, error) {
+	val, err := s.provider.Get(key)
 	if err != nil {
 		return 0, err
 	}
@@ -86,8 +86,8 @@ func (s *cacheServiceImpl) GetFloat64(key string) (float64, error) {
 	return result, nil
 }
 
-func (s *cacheServiceImpl) GetBool(key string) (bool, error) {
-	val, err := s.cacheRepository.Get(key)
+func (s *keyValueStore) GetBool(key string) (bool, error) {
+	val, err := s.provider.Get(key)
 	if err != nil {
 		return false, err
 	}
@@ -104,8 +104,8 @@ func (s *cacheServiceImpl) GetBool(key string) (bool, error) {
 	return result, nil
 }
 
-func (s *cacheServiceImpl) GetJSON(key string, dest interface{}) error {
-	val, err := s.cacheRepository.Get(key)
+func (s *keyValueStore) GetJSON(key string, dest interface{}) error {
+	val, err := s.provider.Get(key)
 	if err != nil {
 		return err
 	}

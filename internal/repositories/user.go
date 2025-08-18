@@ -6,6 +6,7 @@ import (
 
 	"github.com/imlargo/go-api-template/internal/infrastructure/cache"
 	"github.com/imlargo/go-api-template/internal/models"
+	"github.com/imlargo/go-api-template/pkg/kv"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -21,13 +22,13 @@ type UserRepository interface {
 
 type userRepositoryImpl struct {
 	db           *gorm.DB
-	cacheService cache.CacheService
+	cacheService kv.KeyValueStore
 	cacheKeys    cache.CacheKeys
 }
 
 func NewUserRepository(
 	db *gorm.DB,
-	cacheService cache.CacheService,
+	cacheService kv.KeyValueStore,
 	cacheKeys cache.CacheKeys,
 ) UserRepository {
 	return &userRepositoryImpl{

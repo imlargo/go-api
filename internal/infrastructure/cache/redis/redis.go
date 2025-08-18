@@ -6,21 +6,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/infrastructure/cache"
+	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/redis/go-redis/v9"
 )
 
-type RedisCache struct {
+type redisCache struct {
 	client *redis.Client
 }
 
-func NewRedisCacheRepository(redisClient *RedisClient) cache.CacheRepository {
-	return &RedisCache{
-		client: redisClient.GetClient(),
+func NewRedisCache(client *redis.Client) kv.KvProvider {
+	return &redisCache{
+		client: client,
 	}
 }
 
-func (r *RedisCache) Set(key string, value interface{}, expiration time.Duration) error {
+func (r *redisCache) Set(key string, value interface{}, expiration time.Duration) error {
 	jsonValue, err := json.Marshal(value)
 	if err != nil {
 		return fmt.Errorf("error marshaling value: %w", err)
@@ -34,7 +34,7 @@ func (r *RedisCache) Set(key string, value interface{}, expiration time.Duration
 	return nil
 }
 
-func (r *RedisCache) Get(key string) (string, error) {
+func (r *redisCache) Get(key string) (string, error) {
 	result, err := r.client.Get(context.Background(), key).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -46,7 +46,7 @@ func (r *RedisCache) Get(key string) (string, error) {
 	return result, nil
 }
 
-func (r *RedisCache) Delete(key string) error {
+func (r *redisCache) Delete(key string) error {
 	err := r.client.Del(context.Background(), key).Err()
 	if err != nil {
 		return fmt.Errorf("error deleting cache key %s: %w", key, err)
@@ -55,7 +55,7 @@ func (r *RedisCache) Delete(key string) error {
 	return nil
 }
 
-func (r *RedisCache) Exists(key string) (bool, error) {
+func (r *redisCache) Exists(key string) (bool, error) {
 	result, err := r.client.Exists(context.Background(), key).Result()
 	if err != nil {
 		return false, fmt.Errorf("error checking if key %s exists: %w", key, err)
@@ -64,7 +64,7 @@ func (r *RedisCache) Exists(key string) (bool, error) {
 	return result > 0, nil
 }
 
-func (r *RedisCache) Ping() error {
+func (r *redisCache) Ping() error {
 	err := r.client.Ping(context.Background()).Err()
 	if err != nil {
 		return fmt.Errorf("error pinging Redis: %w", err)

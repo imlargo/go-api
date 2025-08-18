@@ -11,6 +11,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/presentation/http/middleware"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
+	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/imlargo/go-api-template/pkg/push"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/sse"
@@ -27,7 +28,7 @@ type Application struct {
 	Store       *store.Store
 	Storage     storage.FileStorage
 	Metrics     metrics.MetricsService
-	Cache       cache.CacheService
+	Cache       kv.KeyValueStore
 	CacheKeys   cache.CacheKeys
 	RateLimiter ratelimiter.RateLimiter
 	Router      *gin.Engine

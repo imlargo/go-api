@@ -1,8 +1,8 @@
-package cache
+package kv
 
 import "time"
 
-type CacheRepository interface {
+type KvProvider interface {
 	Set(key string, value interface{}, expiration time.Duration) error
 	Get(key string) (string, error)
 	Delete(key string) error

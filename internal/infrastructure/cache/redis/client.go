@@ -11,11 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type RedisClient struct {
-	client *redis.Client
-}
-
-func NewRedisClient(redisURL string) (*RedisClient, error) {
+func NewRedisClient(redisURL string) (*redis.Client, error) {
 	parsedURL, err := url.Parse(redisURL)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing Redis URL: %w", err)
@@ -58,13 +54,5 @@ func NewRedisClient(redisURL string) (*RedisClient, error) {
 	}
 
 	log.Println("[Redis] Connected successfully.")
-	return &RedisClient{client: client}, nil
-}
-
-func (r *RedisClient) GetClient() *redis.Client {
-	return r.client
-}
-
-func (r *RedisClient) Close() error {
-	return r.client.Close()
+	return client, nil
 }

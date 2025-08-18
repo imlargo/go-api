@@ -63,7 +63,7 @@ func main() {
 	}
 
 	// Cache
-	cacheRepository := redis.NewRedisCacheRepository(redisClient)
+	cacheRepository := redis.NewRedisCache(redisClient)
 	cacheService := cache.NewCacheService(cacheRepository)
 	cacheKeys := cache.NewCacheKeys(cachekey.NewBuilder("api", "v1"))
 
