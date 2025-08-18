@@ -11,7 +11,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/application/services"
 	_ "github.com/imlargo/go-api-template/internal/models"
 
-	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
+	"github.com/imlargo/go-api-template/internal/responses"
 )
 
 type FileController interface {

@@ -12,7 +12,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/enums"
 	"github.com/imlargo/go-api-template/internal/models"
 
-	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
+	"github.com/imlargo/go-api-template/internal/responses"
 )
 
 type NotificationController interface {

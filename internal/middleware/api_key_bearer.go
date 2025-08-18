@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api-template/internal/presentation/http/responses"
+	"github.com/imlargo/go-api-template/internal/responses"
 )
 
 func BearerApiKeyMiddleware(apiKey string) gin.HandlerFunc {
