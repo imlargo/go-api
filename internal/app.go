@@ -3,12 +3,12 @@ package internal
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/imlargo/go-api-template/api/docs"
-	"github.com/imlargo/go-api-template/internal/application/services"
 	"github.com/imlargo/go-api-template/internal/cache"
 	"github.com/imlargo/go-api-template/internal/config"
 	"github.com/imlargo/go-api-template/internal/handlers"
 	"github.com/imlargo/go-api-template/internal/metrics"
 	"github.com/imlargo/go-api-template/internal/middleware"
+	"github.com/imlargo/go-api-template/internal/services"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
 	"github.com/imlargo/go-api-template/pkg/kv"

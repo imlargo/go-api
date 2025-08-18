@@ -7,10 +7,10 @@ import (
 
 	"github.com/SherClockHolmes/webpush-go"
 	"github.com/gin-gonic/gin"
-	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
-	"github.com/imlargo/go-api-template/internal/application/services"
+	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
 	"github.com/imlargo/go-api-template/internal/enums"
 	"github.com/imlargo/go-api-template/internal/models"
+	"github.com/imlargo/go-api-template/internal/services"
 
 	"github.com/imlargo/go-api-template/internal/responses"
 )

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
-	requestsdto "github.com/imlargo/go-api-template/internal/application/dto/requests"
-	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
 	"github.com/imlargo/go-api-template/internal/config"
+	requestsdto "github.com/imlargo/go-api-template/internal/dto/requests"
+	responsesdto "github.com/imlargo/go-api-template/internal/dto/responses"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"

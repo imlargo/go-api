@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	responsesdto "github.com/imlargo/go-api-template/internal/application/dto/responses"
+	responsesdto "github.com/imlargo/go-api-template/internal/dto/responses"
 	"github.com/imlargo/go-api-template/internal/models"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/storage"
