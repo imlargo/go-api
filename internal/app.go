@@ -15,7 +15,7 @@ import (
 	"github.com/imlargo/go-api-template/pkg/notification/sse"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/storage"
-	utils "github.com/imlargo/go-api-template/pkg/tools"
+	"github.com/imlargo/go-api-template/pkg/utils"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
