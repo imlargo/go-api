@@ -4,10 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/config"
 	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,18 +19,16 @@ type AuthService interface {
 }
 
 type authService struct {
-	store            *store.Store
+	*Service
 	userService      UserService
 	jwtAuthenticator *jwt.JWT
-	authConfig       config.AuthConfig
 }
 
-func NewAuthService(store *store.Store, userService UserService, jwtAuthenticator *jwt.JWT, authConfig config.AuthConfig) AuthService {
+func NewAuthService(service *Service, userService UserService, jwtAuthenticator *jwt.JWT) AuthService {
 	return &authService{
-		store,
+		service,
 		userService,
 		jwtAuthenticator,
-		authConfig,
 	}
 }
 
@@ -50,8 +46,8 @@ func (s *authService) Login(email, password string) (*dto.UserAuthResponse, erro
 		return nil, errors.New("invalid user or password")
 	}
 
-	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
-	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
+	accessExpiration := time.Now().Add(s.config.Auth.TokenExpiration)
+	refreshExpiration := time.Now().Add(s.config.Auth.RefreshExpiration)
 	accessToken, err := s.jwtAuthenticator.GenerateToken(user.ID, accessExpiration)
 	if err != nil {
 		return nil, err
@@ -81,8 +77,8 @@ func (s *authService) Register(user *dto.RegisterUser) (*dto.UserAuthResponse, e
 		return nil, err
 	}
 
-	accessExpiration := time.Now().Add(s.authConfig.TokenExpiration)
-	refreshExpiration := time.Now().Add(s.authConfig.RefreshExpiration)
+	accessExpiration := time.Now().Add(s.config.Auth.TokenExpiration)
+	refreshExpiration := time.Now().Add(s.config.Auth.RefreshExpiration)
 	accessToken, err := s.jwtAuthenticator.GenerateToken(createdUser.ID, accessExpiration)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,6 @@ import (
 
 	"github.com/imlargo/go-api-template/internal/dto"
 	"github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/internal/store"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,12 +17,12 @@ type UserService interface {
 }
 
 type userService struct {
-	store *store.Store
+	*Service
 }
 
-func NewUserService(store *store.Store) UserService {
+func NewUserService(service *Service) UserService {
 	return &userService{
-		store,
+		Service: service,
 	}
 }
 
