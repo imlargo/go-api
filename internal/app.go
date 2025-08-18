@@ -12,7 +12,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/shared/ports"
 	"github.com/imlargo/go-api-template/internal/shared/utils"
 	"github.com/imlargo/go-api-template/internal/store"
-	"github.com/imlargo/go-api-template/pkg/auth/jwt"
+	"github.com/imlargo/go-api-template/pkg/jwt"
 	"github.com/imlargo/go-api-template/pkg/notification/push"
 	"github.com/imlargo/go-api-template/pkg/notification/sse"
 	"github.com/imlargo/go-api-template/pkg/storage"
