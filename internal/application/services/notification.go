@@ -32,12 +32,12 @@ type NotificationService interface {
 }
 
 type notificationServiceImpl struct {
-	store *store.Storage
+	store *store.Store
 	SSE   ports.SSENotificationDispatcher
 	Push  ports.PushNotifier
 }
 
-func NewNotificationService(store *store.Storage, sse ports.SSENotificationDispatcher, push ports.PushNotifier) NotificationService {
+func NewNotificationService(store *store.Store, sse ports.SSENotificationDispatcher, push ports.PushNotifier) NotificationService {
 	return &notificationServiceImpl{
 		store: store,
 		SSE:   sse,

@@ -18,10 +18,10 @@ type UserService interface {
 }
 
 type userServiceImpl struct {
-	store *store.Storage
+	store *store.Store
 }
 
-func NewUserService(store *store.Storage) UserService {
+func NewUserService(store *store.Store) UserService {
 	return &userServiceImpl{
 		store,
 	}

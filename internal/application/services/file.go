@@ -31,7 +31,7 @@ type FileService interface {
 }
 
 type fileServiceImpl struct {
-	store              *store.Storage
+	store              *store.Store
 	storageService     storage.StorageAdapter
 	defaultBucket      string
 	maxFileSize        int64
@@ -39,7 +39,7 @@ type fileServiceImpl struct {
 }
 
 func NewFileService(
-	store *store.Storage,
+	store *store.Store,
 	storageService storage.StorageAdapter,
 	defaultBucket string,
 ) FileService {

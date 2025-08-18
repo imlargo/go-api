@@ -20,12 +20,12 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
-	store            *store.Storage
+	store            *store.Store
 	userService      UserService
 	jwtAuthenticator ports.JWTAuthenticator
 }
 
-func NewAuthService(store *store.Storage, userService UserService, jwtAuthenticator ports.JWTAuthenticator) AuthService {
+func NewAuthService(store *store.Store, userService UserService, jwtAuthenticator ports.JWTAuthenticator) AuthService {
 	return &authServiceImpl{
 		store,
 		userService,

@@ -24,7 +24,7 @@ import (
 
 type Application struct {
 	Config      config.AppConfig
-	Store       *store.Storage
+	Store       *store.Store
 	Storage     storage.StorageAdapter
 	Metrics     metrics.MetricsService
 	Cache       cache.CacheService
