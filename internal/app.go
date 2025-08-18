@@ -12,8 +12,8 @@ import (
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/jwt"
 	"github.com/imlargo/go-api-template/pkg/notification/push"
-	"github.com/imlargo/go-api-template/pkg/notification/sse"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
+	"github.com/imlargo/go-api-template/pkg/sse"
 	"github.com/imlargo/go-api-template/pkg/storage"
 	"github.com/imlargo/go-api-template/pkg/utils"
 
@@ -42,14 +42,14 @@ func (app *Application) Mount() {
 	})
 
 	// Adapters
-	sseNotificationDispatcher := sse.NewNotificationSubscriptionManager()
+	sseManager := sse.NewSSEManager()
 	pushNotificationDispatcher := push.NewPushNotifier(app.Config.PushNotification.VAPIDPrivateKey, app.Config.PushNotification.VAPIDPublicKey)
 
 	// Services
 	userService := services.NewUserService(app.Store)
 	authService := services.NewAuthService(app.Store, userService, jwtAuth, app.Config.Auth)
 	fileService := services.NewFileService(app.Store, app.Storage, app.Config.Storage.BucketName)
-	notificationService := services.NewNotificationService(app.Store, sseNotificationDispatcher, pushNotificationDispatcher)
+	notificationService := services.NewNotificationService(app.Store, sseManager, pushNotificationDispatcher)
 
 	// Handlers
 	authController := handlers.NewAuthController(authService)

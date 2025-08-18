@@ -11,13 +11,14 @@ import (
 	"github.com/imlargo/go-api-template/internal/domain/models"
 	"github.com/imlargo/go-api-template/internal/shared/ports"
 	"github.com/imlargo/go-api-template/internal/store"
+	"github.com/imlargo/go-api-template/pkg/sse"
 )
 
 type NotificationService interface {
 	DispatchNotification(userID uint, title, message, notifType string) error
 
 	DispatchSSE(notification *models.Notification) error
-	SubscribeSSE(ctx context.Context, userID uint, deviceID string) (ports.SSENotificationConnection, error)
+	SubscribeSSE(ctx context.Context, userID uint, deviceID string) (sse.Connection, error)
 	UnsubscribeSSE(userID uint, deviceID string) error
 
 	DispatchPush(userID uint, notification *models.Notification) error
@@ -33,11 +34,11 @@ type NotificationService interface {
 
 type notificationServiceImpl struct {
 	store *store.Store
-	SSE   ports.SSENotificationDispatcher
+	SSE   sse.SSEManager
 	Push  ports.PushNotifier
 }
 
-func NewNotificationService(store *store.Store, sse ports.SSENotificationDispatcher, push ports.PushNotifier) NotificationService {
+func NewNotificationService(store *store.Store, sse sse.SSEManager, push ports.PushNotifier) NotificationService {
 	return &notificationServiceImpl{
 		store: store,
 		SSE:   sse,
@@ -75,7 +76,10 @@ func (d *notificationServiceImpl) DispatchSSE(notification *models.Notification)
 		// return err
 	}
 
-	return d.SSE.Send(notification)
+	return d.SSE.Send(notification.UserID, &sse.Message{
+		Event: "notification",
+		Data:  notification,
+	})
 }
 
 func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models.Notification) error {
@@ -109,7 +113,7 @@ func (d *notificationServiceImpl) DispatchPush(userID uint, notification *models
 	return nil
 }
 
-func (d *notificationServiceImpl) SubscribeSSE(ctx context.Context, userID uint, deviceID string) (ports.SSENotificationConnection, error) {
+func (d *notificationServiceImpl) SubscribeSSE(ctx context.Context, userID uint, deviceID string) (sse.Connection, error) {
 	return d.SSE.Subscribe(ctx, userID, deviceID)
 }
 

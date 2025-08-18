@@ -1,17 +1,17 @@
-package sse2
+package sse
 
 import (
 	"context"
 	"time"
 )
 
-type SSENotificationConnection interface {
+type Connection interface {
 	GetChannel() <-chan *Message
 	GetContext() context.Context
 	UpdateLastSeen()
 }
 
-type ConnectionClient struct {
+type clientConn struct {
 	ID       string
 	UserID   uint
 	Channel  chan *Message
@@ -20,14 +20,14 @@ type ConnectionClient struct {
 	LastSeen time.Time
 }
 
-func (c *ConnectionClient) GetChannel() <-chan *Message {
+func (c *clientConn) GetChannel() <-chan *Message {
 	return c.Channel
 }
 
-func (c *ConnectionClient) GetContext() context.Context {
+func (c *clientConn) GetContext() context.Context {
 	return c.Context
 }
 
-func (c *ConnectionClient) UpdateLastSeen() {
+func (c *clientConn) UpdateLastSeen() {
 	c.LastSeen = time.Now()
 }

@@ -1,4 +1,4 @@
-package sse2
+package sse
 
 import (
 	"context"
@@ -9,22 +9,22 @@ import (
 
 type SSEManager interface {
 	Send(userID uint, message *Message) error
-	Subscribe(ctx context.Context, userID uint, clientID string) (SSENotificationConnection, error)
+	Subscribe(ctx context.Context, userID uint, clientID string) (Connection, error)
 	Unsubscribe(userID uint, clientID string) error
 	GetSSESubscriptions() map[string]interface{}
 }
 
 type sseManager struct {
-	clients    map[string]*ConnectionClient
-	userIndex  map[uint]map[string]*ConnectionClient // userID -> clientID -> Client
+	clients    map[string]*clientConn
+	userIndex  map[uint]map[string]*clientConn // userID -> clientID -> clientConn
 	mutex      sync.RWMutex
 	pingTicker *time.Ticker
 }
 
 func NewSSEManager() SSEManager {
 	service := &sseManager{
-		clients:    make(map[string]*ConnectionClient),
-		userIndex:  make(map[uint]map[string]*ConnectionClient),
+		clients:    make(map[string]*clientConn),
+		userIndex:  make(map[uint]map[string]*clientConn),
 		pingTicker: time.NewTicker(30 * time.Second),
 	}
 
@@ -34,7 +34,7 @@ func NewSSEManager() SSEManager {
 	return service
 }
 
-func (sm *sseManager) Subscribe(ctx context.Context, userID uint, clientID string) (SSENotificationConnection, error) {
+func (sm *sseManager) Subscribe(ctx context.Context, userID uint, clientID string) (Connection, error) {
 	sm.mutex.Lock()
 	defer sm.mutex.Unlock()
 
@@ -46,7 +46,7 @@ func (sm *sseManager) Subscribe(ctx context.Context, userID uint, clientID strin
 
 	clientCtx, cancel := context.WithCancel(ctx)
 
-	client := &ConnectionClient{
+	client := &clientConn{
 		ID:       clientID,
 		UserID:   userID,
 		Channel:  make(chan *Message, 100), // Buffer para evitar bloqueos
@@ -58,7 +58,7 @@ func (sm *sseManager) Subscribe(ctx context.Context, userID uint, clientID strin
 	sm.clients[clientID] = client
 
 	if sm.userIndex[userID] == nil {
-		sm.userIndex[userID] = make(map[string]*ConnectionClient)
+		sm.userIndex[userID] = make(map[string]*clientConn)
 	}
 
 	sm.userIndex[userID][clientID] = client
@@ -95,7 +95,7 @@ func (sm *sseManager) Send(userID uint, message *Message) error {
 	}
 
 	// Prevent concurrentcy issues by copying the map
-	clients := make([]*ConnectionClient, 0, len(userClients))
+	clients := make([]*clientConn, 0, len(userClients))
 	for _, client := range userClients {
 		clients = append(clients, client)
 	}
@@ -105,7 +105,7 @@ func (sm *sseManager) Send(userID uint, message *Message) error {
 	for _, client := range clients {
 		wg.Add(1)
 
-		go func(c *ConnectionClient) {
+		go func(c *clientConn) {
 			defer wg.Done()
 			select {
 			case c.Channel <- message:
@@ -113,7 +113,7 @@ func (sm *sseManager) Send(userID uint, message *Message) error {
 			case <-time.After(5 * time.Second):
 				// Timeout sending notification
 			case <-c.Context.Done():
-				// Client disconnected during send
+				// clientConn disconnected during send
 			}
 		}(client)
 	}

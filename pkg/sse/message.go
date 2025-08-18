@@ -1,4 +1,4 @@
-package sse2
+package sse
 
 type Message struct {
 	Event string `json:"event"`
