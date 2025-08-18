@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +15,7 @@ import (
 	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/storage"
+	"go.uber.org/zap"
 )
 
 // @title Go api
@@ -36,10 +36,14 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
 	// Database
 	db, err := postgres.NewPostgres(cfg.Database.URL)
 	if err != nil {
-		log.Fatal("Could not initialize database: ", err)
+		logger.Fatal("Could not initialize database: ", err)
 	}
 
 	// Storage
@@ -52,14 +56,14 @@ func main() {
 		UsePublicURL:    cfg.Storage.UsePublicURL,
 	})
 	if err != nil {
-		log.Fatal("Could not initialize storage service: ", err)
+		logger.Fatal("Could not initialize storage service: ", err)
 		return
 	}
 
 	// Redis
 	redisClient, err := redis.NewRedisClient(cfg.Redis.RedisURL)
 	if err != nil {
-		log.Fatal("Could not initialize Redis client: ", err)
+		logger.Fatal("Could not initialize Redis client: ", err)
 		return
 	}
 
@@ -73,7 +77,7 @@ func main() {
 
 	// Rate Limiter
 	if cfg.RateLimiter.Enabled {
-		log.Printf("Initializing rate limiter with config: %s request every %.2f seconds", strconv.Itoa(cfg.RateLimiter.RequestsPerTimeFrame), cfg.RateLimiter.TimeFrame.Seconds())
+		logger.Infof("Initializing rate limiter with config: %s request every %.2f seconds", strconv.Itoa(cfg.RateLimiter.RequestsPerTimeFrame), cfg.RateLimiter.TimeFrame.Seconds())
 	}
 	rateLimiter := ratelimiter.NewTokenBucketLimiter(ratelimiter.Config{
 		RequestsPerTimeFrame: cfg.RateLimiter.RequestsPerTimeFrame,
@@ -94,11 +98,12 @@ func main() {
 		CacheKeys:   cacheKeys,
 		RateLimiter: rateLimiter,
 		Router:      router,
+		Logger:      logger,
 	}
 
 	app.Mount()
 
-	println("Starting API...")
+	logger.Info("Starting API...")
 
 	app.Run()
 }
