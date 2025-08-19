@@ -1,4 +1,4 @@
-package cachekey
+package kv
 
 import (
 	"crypto/md5"

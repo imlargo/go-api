@@ -11,7 +11,6 @@ import (
 	postgres "github.com/imlargo/go-api-template/internal/database"
 	"github.com/imlargo/go-api-template/internal/metrics"
 	"github.com/imlargo/go-api-template/internal/store"
-	cachekey "github.com/imlargo/go-api-template/pkg/keybuilder"
 	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
 	"github.com/imlargo/go-api-template/pkg/storage"
@@ -70,7 +69,7 @@ func main() {
 	// Cache
 	cacheProvider := redis.NewRedisCache(redisClient)
 	cacheService := kv.NewKeyValueStore(cacheProvider)
-	cacheKeys := cache.NewCacheKeys(cachekey.NewBuilder("api", "v1"))
+	cacheKeys := cache.NewCacheKeys(kv.NewBuilder("api", "v1"))
 
 	// Repositories
 	store := store.NewStorage(db, cacheService, cacheKeys)

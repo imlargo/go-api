@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	cachekey "github.com/imlargo/go-api-template/pkg/keybuilder"
+	"github.com/imlargo/go-api-template/pkg/kv"
 )
 
 type CacheKeys interface {
@@ -45,10 +45,10 @@ type CacheKeys interface {
 }
 
 type cacheKeysImpl struct {
-	builder cachekey.Builder
+	builder kv.Builder
 }
 
-func NewCacheKeys(keyBuilder cachekey.Builder) CacheKeys {
+func NewCacheKeys(keyBuilder kv.Builder) CacheKeys {
 	return &cacheKeysImpl{builder: keyBuilder}
 }
 
