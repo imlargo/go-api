@@ -57,9 +57,10 @@ func (app *Application) Mount() {
 	notificationService := services.NewNotificationService(container, sseManager, pushNotificationDispatcher)
 
 	// Handlers
-	authController := handlers.NewAuthController(authService)
-	notificationController := handlers.NewNotificationController(notificationService)
-	fileController := handlers.NewFileHandler(fileService)
+	handlerContainer := handlers.NewHandler(app.Logger)
+	authHandler := handlers.NewAuthHandler(handlerContainer, authService)
+	notificationHandler := handlers.NewNotificationHandler(handlerContainer, notificationService)
+	fileHandler := handlers.NewFileHandler(handlerContainer, fileService)
 
 	// Middlewares
 	apiKeyMiddleware := middleware.ApiKeyMiddleware(app.Config.Auth.ApiKey)
@@ -81,28 +82,28 @@ func (app *Application) Mount() {
 	app.registerDocs()
 
 	// Routes
-	app.Router.POST("/auth/login", authController.Login)
-	app.Router.POST("/auth/register", authController.Register)
-	app.Router.GET("/auth/me", authMiddleware, authController.GetUserInfo)
+	app.Router.POST("/auth/login", authHandler.Login)
+	app.Router.POST("/auth/register", authHandler.Register)
+	app.Router.GET("/auth/me", authMiddleware, authHandler.GetUserInfo)
 
-	app.Router.GET("/api/v1/notifications/subscribe", notificationController.SubscribeSSE)
+	app.Router.GET("/api/v1/notifications/subscribe", notificationHandler.SubscribeSSE)
 
 	v1 := app.Router.Group("/api/v1", authMiddleware)
 
 	// Files
-	v1.GET("/files/:id/download", fileController.DownloadFile)
+	v1.GET("/files/:id/download", fileHandler.DownloadFile)
 
 	// Notifications
-	v1.GET("/notifications", notificationController.GetUserNotifications)
-	v1.POST("/notifications/read", notificationController.MarkNotificationsAsRead)
+	v1.GET("/notifications", notificationHandler.GetUserNotifications)
+	v1.POST("/notifications/read", notificationHandler.MarkNotificationsAsRead)
 
-	v1.POST("/notifications/send", apiKeyMiddleware, notificationController.DispatchSSE)
-	v1.POST("/notifications/unsubscribe", notificationController.UnsubscribeSSE)
-	v1.GET("/notifications/subscriptions", notificationController.GetSSESubscriptions)
-	v1.POST("/notifications/push/send", apiKeyMiddleware, notificationController.DispatchPush)
-	v1.POST("/notifications/push/subscribe/:userID", notificationController.SubscribePush)
-	v1.GET("/notifications/push/subscriptions/:id", notificationController.GetPushSubscription)
-	v1.POST("/notifications/dispatch", notificationController.DispatchNotification)
+	v1.POST("/notifications/send", apiKeyMiddleware, notificationHandler.DispatchSSE)
+	v1.POST("/notifications/unsubscribe", notificationHandler.UnsubscribeSSE)
+	v1.GET("/notifications/subscriptions", notificationHandler.GetSSESubscriptions)
+	v1.POST("/notifications/push/send", apiKeyMiddleware, notificationHandler.DispatchPush)
+	v1.POST("/notifications/push/subscribe/:userID", notificationHandler.SubscribePush)
+	v1.GET("/notifications/push/subscriptions/:id", notificationHandler.GetPushSubscription)
+	v1.POST("/notifications/dispatch", notificationHandler.DispatchNotification)
 }
 
 func (app *Application) registerDocs() {

@@ -14,29 +14,16 @@ import (
 	"github.com/imlargo/go-api-template/internal/services"
 )
 
-type NotificationController interface {
-	SubscribeSSE(c *gin.Context)
-	UnsubscribeSSE(c *gin.Context)
-	DispatchSSE(c *gin.Context)
-
-	SubscribePush(c *gin.Context)
-	DispatchPush(c *gin.Context)
-
-	GetPushSubscription(c *gin.Context)
-
-	GetSSESubscriptions(c *gin.Context)
-	GetUserNotifications(c *gin.Context)
-	MarkNotificationsAsRead(c *gin.Context)
-
-	DispatchNotification(c *gin.Context) // Deprecated
-}
-
-type NotificationControllerImpl struct {
+type NotificationHandler struct {
+	*Handler
 	notificationService services.NotificationService
 }
 
-func NewNotificationController(notificationService services.NotificationService) NotificationController {
-	return &NotificationControllerImpl{notificationService: notificationService}
+func NewNotificationHandler(handler *Handler, notificationService services.NotificationService) *NotificationHandler {
+	return &NotificationHandler{
+		Handler:             handler,
+		notificationService: notificationService,
+	}
 }
 
 // @Summary		Subscribe to notifications
@@ -50,7 +37,7 @@ func NewNotificationController(notificationService services.NotificationService)
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (u *NotificationControllerImpl) SubscribeSSE(c *gin.Context) {
+func (h *NotificationHandler) SubscribeSSE(c *gin.Context) {
 	userIDStr := c.Query("user_id")
 	deviceID := c.Query("device_id")
 
@@ -72,7 +59,7 @@ func (u *NotificationControllerImpl) SubscribeSSE(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("Access-Control-Allow-Headers", "Cache-Control")
 
-	client, err := u.notificationService.SubscribeSSE(c.Request.Context(), uint(userID), deviceID)
+	client, err := h.notificationService.SubscribeSSE(c.Request.Context(), uint(userID), deviceID)
 	if err != nil {
 		responses.ErrorBadRequest(c, fmt.Sprintf("error subscribing: %v", err))
 		return
@@ -123,7 +110,7 @@ func (u *NotificationControllerImpl) SubscribeSSE(c *gin.Context) {
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Param		payload body	dto.SendNotificationRequestPayload	true	"Notification Payload"
 // @Security     PushApiKey
-func (h *NotificationControllerImpl) DispatchSSE(c *gin.Context) {
+func (h *NotificationHandler) DispatchSSE(c *gin.Context) {
 	var payload dto.SendNotificationRequestPayload
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBindJson(c, err)
@@ -162,7 +149,7 @@ func (h *NotificationControllerImpl) DispatchSSE(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *NotificationControllerImpl) UnsubscribeSSE(c *gin.Context) {
+func (h *NotificationHandler) UnsubscribeSSE(c *gin.Context) {
 	var payload dto.NotificationSubscriptionPayload
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -197,7 +184,7 @@ func (h *NotificationControllerImpl) UnsubscribeSSE(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (u *NotificationControllerImpl) SubscribePush(c *gin.Context) {
+func (h *NotificationHandler) SubscribePush(c *gin.Context) {
 	var sub webpush.Subscription
 
 	userID := c.Param("userID")
@@ -216,7 +203,7 @@ func (u *NotificationControllerImpl) SubscribePush(c *gin.Context) {
 		return
 	}
 
-	subscription, err2 := u.notificationService.SubscribePush(uint(userIDInt), sub.Endpoint, sub.Keys.P256dh, sub.Keys.Auth)
+	subscription, err2 := h.notificationService.SubscribePush(uint(userIDInt), sub.Endpoint, sub.Keys.P256dh, sub.Keys.Auth)
 	if err2 != nil {
 		responses.ErrorInternalServer(c)
 		return
@@ -238,7 +225,7 @@ func (u *NotificationControllerImpl) SubscribePush(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     PushApiKey
-func (u *NotificationControllerImpl) DispatchPush(c *gin.Context) {
+func (h *NotificationHandler) DispatchPush(c *gin.Context) {
 
 	var payload dto.PushNotificationRequestPayload
 
@@ -247,7 +234,7 @@ func (u *NotificationControllerImpl) DispatchPush(c *gin.Context) {
 		return
 	}
 
-	err := u.notificationService.DispatchPush(payload.UserID, &models.Notification{
+	err := h.notificationService.DispatchPush(payload.UserID, &models.Notification{
 		Title:       payload.Title,
 		Description: payload.Message,
 		Category:    enums.NotificationType(payload.Category),
@@ -271,8 +258,8 @@ func (u *NotificationControllerImpl) DispatchPush(c *gin.Context) {
 // @Produce		json
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     PushApiKey
-func (u *NotificationControllerImpl) GetSSESubscriptions(c *gin.Context) {
-	subscriptions := u.notificationService.GetSSESubscriptions()
+func (h *NotificationHandler) GetSSESubscriptions(c *gin.Context) {
+	subscriptions := h.notificationService.GetSSESubscriptions()
 	if subscriptions == nil {
 		responses.ErrorInternalServer(c)
 		return
@@ -293,7 +280,7 @@ func (u *NotificationControllerImpl) GetSSESubscriptions(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
-func (u *NotificationControllerImpl) GetUserNotifications(c *gin.Context) {
+func (h *NotificationHandler) GetUserNotifications(c *gin.Context) {
 	userIDStr := c.Query("user_id")
 	if userIDStr == "" {
 		responses.ErrorBadRequest(c, "user_id is required")
@@ -306,7 +293,7 @@ func (u *NotificationControllerImpl) GetUserNotifications(c *gin.Context) {
 		return
 	}
 
-	notifications, err := u.notificationService.GetUserNotifications(uint(userID))
+	notifications, err := h.notificationService.GetUserNotifications(uint(userID))
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, fmt.Sprintf("error fetching notifications: %v", err))
 		return
@@ -325,7 +312,7 @@ func (u *NotificationControllerImpl) GetUserNotifications(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (u *NotificationControllerImpl) MarkNotificationsAsRead(c *gin.Context) {
+func (h *NotificationHandler) MarkNotificationsAsRead(c *gin.Context) {
 	userIDStr := c.Query("user_id")
 	if userIDStr == "" {
 		responses.ErrorBadRequest(c, "user_id is required")
@@ -338,7 +325,7 @@ func (u *NotificationControllerImpl) MarkNotificationsAsRead(c *gin.Context) {
 		return
 	}
 
-	err = u.notificationService.MarkNotificationsAsRead(uint(userID))
+	err = h.notificationService.MarkNotificationsAsRead(uint(userID))
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, fmt.Sprintf("error marking notifications as read: %v", err))
 		return
@@ -359,7 +346,7 @@ func (u *NotificationControllerImpl) MarkNotificationsAsRead(c *gin.Context) {
 // @Failure		404	{object}	responses.ErrorResponse	"Not Found"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (u *NotificationControllerImpl) GetPushSubscription(c *gin.Context) {
+func (h *NotificationHandler) GetPushSubscription(c *gin.Context) {
 
 	subscriptionIDStr := c.Param("id")
 	if subscriptionIDStr == "" {
@@ -373,7 +360,7 @@ func (u *NotificationControllerImpl) GetPushSubscription(c *gin.Context) {
 		return
 	}
 
-	subscription, err := u.notificationService.GetPushSubscription(uint(subscriptionID))
+	subscription, err := h.notificationService.GetPushSubscription(uint(subscriptionID))
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, fmt.Sprintf("error fetching subscription: %v", err))
 		return
@@ -396,6 +383,6 @@ func (u *NotificationControllerImpl) GetPushSubscription(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     PushApiKey
-func (u *NotificationControllerImpl) DispatchNotification(c *gin.Context) {
-	u.notificationService.DispatchNotification(36, "Test Notification", "This is a test notification", string(enums.NotificationTypeBase))
+func (h *NotificationHandler) DispatchNotification(c *gin.Context) {
+	h.notificationService.DispatchNotification(36, "Test Notification", "This is a test notification", string(enums.NotificationTypeBase))
 }

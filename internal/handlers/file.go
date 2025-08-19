@@ -13,20 +13,14 @@ import (
 	"github.com/imlargo/go-api-template/internal/services"
 )
 
-type FileController interface {
-	UploadFile(c *gin.Context)
-	GetFile(c *gin.Context)
-	DeleteFile(c *gin.Context)
-	GetPresignedURL(c *gin.Context)
-	DownloadFile(c *gin.Context)
-}
-
-type FileControllerImpl struct {
+type FileHandler struct {
+	*Handler
 	fileService services.FileService
 }
 
-func NewFileHandler(fileService services.FileService) FileController {
-	return &FileControllerImpl{
+func NewFileHandler(handler *Handler, fileService services.FileService) *FileHandler {
+	return &FileHandler{
+		Handler:     handler,
 		fileService: fileService,
 	}
 }
@@ -42,7 +36,7 @@ func NewFileHandler(fileService services.FileService) FileController {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *FileControllerImpl) UploadFile(c *gin.Context) {
+func (h *FileHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
 		responses.ErrorBadRequest(c, "Invalid file: "+err.Error())
@@ -69,7 +63,7 @@ func (h *FileControllerImpl) UploadFile(c *gin.Context) {
 // @Failure		404	{object}	responses.ErrorResponse	"File Not Found"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *FileControllerImpl) GetFile(c *gin.Context) {
+func (h *FileHandler) GetFile(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -96,7 +90,7 @@ func (h *FileControllerImpl) GetFile(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *FileControllerImpl) DeleteFile(c *gin.Context) {
+func (h *FileHandler) DeleteFile(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -123,7 +117,7 @@ func (h *FileControllerImpl) DeleteFile(c *gin.Context) {
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *FileControllerImpl) GetPresignedURL(c *gin.Context) {
+func (h *FileHandler) GetPresignedURL(c *gin.Context) {
 	fileIDstr := c.Param("id")
 	fileID, err := strconv.Atoi(fileIDstr)
 	if err != nil {
@@ -159,7 +153,7 @@ func (h *FileControllerImpl) GetPresignedURL(c *gin.Context) {
 // @Failure		404	{object}	responses.ErrorResponse	"File Not Found
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *FileControllerImpl) DownloadFile(c *gin.Context) {
+func (h *FileHandler) DownloadFile(c *gin.Context) {
 	fileIDStr := c.Param("id")
 	fileID, err := strconv.Atoi(fileIDStr)
 	if err != nil {
