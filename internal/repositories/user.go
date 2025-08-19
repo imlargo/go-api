@@ -23,13 +23,13 @@ type UserRepository interface {
 type userRepositoryImpl struct {
 	db           *gorm.DB
 	cacheService kv.KeyValueStore
-	cacheKeys    cache.CacheKeys
+	cacheKeys    *cache.CacheKeys
 }
 
 func NewUserRepository(
 	db *gorm.DB,
 	cacheService kv.KeyValueStore,
-	cacheKeys cache.CacheKeys,
+	cacheKeys *cache.CacheKeys,
 ) UserRepository {
 	return &userRepositoryImpl{
 		db,

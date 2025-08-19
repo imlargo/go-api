@@ -14,7 +14,7 @@ type Store struct {
 	Users             repositories.UserRepository
 }
 
-func NewStorage(db *gorm.DB, cacheService kv.KeyValueStore, cacheKeys cache.CacheKeys) *Store {
+func NewStorage(db *gorm.DB, cacheService kv.KeyValueStore, cacheKeys *cache.CacheKeys) *Store {
 	return &Store{
 		Files:             repositories.NewFileRepository(db),
 		Notifications:     repositories.NewNotificationRepository(db),

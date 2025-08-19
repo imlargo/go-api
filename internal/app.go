@@ -30,7 +30,7 @@ type Application struct {
 	Storage     storage.FileStorage
 	Metrics     metrics.MetricsService
 	Cache       kv.KeyValueStore
-	CacheKeys   cache.CacheKeys
+	CacheKeys   *cache.CacheKeys
 	RateLimiter ratelimiter.RateLimiter
 	Logger      *zap.SugaredLogger
 	Router      *gin.Engine
