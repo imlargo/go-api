@@ -49,12 +49,11 @@ func (app *Application) Mount() {
 	pushNotificationDispatcher := push.NewPushNotifier(app.Config.PushNotification.VAPIDPrivateKey, app.Config.PushNotification.VAPIDPublicKey)
 
 	// Services
-	container := services.NewService(app.Store, app.Logger, &app.Config, app.CacheKeys, app.Cache)
-
-	userService := services.NewUserService(container)
-	authService := services.NewAuthService(container, userService, jwtAuth)
-	fileService := services.NewFileService(container, app.Storage)
-	notificationService := services.NewNotificationService(container, sseManager, pushNotificationDispatcher)
+	serviceContainer := services.NewService(app.Store, app.Logger, &app.Config, app.CacheKeys, app.Cache)
+	userService := services.NewUserService(serviceContainer)
+	authService := services.NewAuthService(serviceContainer, userService, jwtAuth)
+	fileService := services.NewFileService(serviceContainer, app.Storage)
+	notificationService := services.NewNotificationService(serviceContainer, sseManager, pushNotificationDispatcher)
 
 	// Handlers
 	handlerContainer := handlers.NewHandler(app.Logger)
