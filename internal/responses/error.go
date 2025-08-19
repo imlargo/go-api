@@ -13,57 +13,37 @@ type ErrorResponse struct {
 }
 
 func ErrorBindJson(c *gin.Context, err error) {
-	c.JSON(http.StatusBadRequest, ErrorResponse{
-		Code:    http.StatusBadRequest,
-		Message: err.Error(),
-		Status:  errBindJson,
-	})
+	NewErrorResponse(c, http.StatusBadRequest, err.Error(), errBindJson)
 }
 
 func ErrorNotFound(c *gin.Context, model string) {
-	c.JSON(http.StatusNotFound, ErrorResponse{
-		Code:    http.StatusNotFound,
-		Message: model + " not found",
-		Status:  errNotFound,
-	})
+	NewErrorResponse(c, http.StatusNotFound, model+" not found", errNotFound)
 }
 
 func ErrorInternalServer(c *gin.Context) {
-	c.JSON(http.StatusInternalServerError, ErrorResponse{
-		Code:    http.StatusInternalServerError,
-		Message: "internal server error",
-		Status:  errInternalServer,
-	})
+	NewErrorResponse(c, http.StatusInternalServerError, "internal server error", errInternalServer)
 }
 
 func ErrorInternalServerWithMessage(c *gin.Context, message string) {
-	c.JSON(http.StatusInternalServerError, ErrorResponse{
-		Code:    http.StatusInternalServerError,
-		Message: message,
-		Status:  errInternalServer,
-	})
+	NewErrorResponse(c, http.StatusInternalServerError, message, errInternalServer)
 }
 
 func ErrorBadRequest(c *gin.Context, message string) {
-	c.JSON(http.StatusBadRequest, ErrorResponse{
-		Code:    http.StatusBadRequest,
-		Message: message,
-		Status:  errBadRequest,
-	})
+	NewErrorResponse(c, http.StatusBadRequest, message, errBadRequest)
 }
 
 func ErrorToManyRequests(c *gin.Context, message string) {
-	c.JSON(http.StatusTooManyRequests, ErrorResponse{
-		Code:    http.StatusTooManyRequests,
-		Message: message,
-		Status:  errToManyRequests,
-	})
+	NewErrorResponse(c, http.StatusTooManyRequests, message, errToManyRequests)
 }
 
 func ErrorUnauthorized(c *gin.Context, message string) {
-	c.JSON(http.StatusUnauthorized, ErrorResponse{
-		Code:    http.StatusUnauthorized,
+	NewErrorResponse(c, http.StatusUnauthorized, message, errUnauthorized)
+}
+
+func NewErrorResponse(c *gin.Context, code int, message string, status string) {
+	c.JSON(code, ErrorResponse{
+		Code:    code,
 		Message: message,
-		Status:  errUnauthorized,
+		Status:  status,
 	})
 }
