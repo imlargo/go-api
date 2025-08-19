@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/imlargo/go-api-template/internal/models"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -17,21 +16,21 @@ type FileRepository interface {
 	DeleteFiles(fileIDs []uint) error
 }
 
-type fileRepositoryImpl struct {
-	db *gorm.DB
+type fileRepository struct {
+	*Repository
 }
 
-func NewFileRepository(db *gorm.DB) FileRepository {
-	return &fileRepositoryImpl{
-		db: db,
+func NewFileRepository(r *Repository) FileRepository {
+	return &fileRepository{
+		Repository: r,
 	}
 }
 
-func (r *fileRepositoryImpl) Create(file *models.File) error {
+func (r *fileRepository) Create(file *models.File) error {
 	return r.db.Create(file).Error
 }
 
-func (r *fileRepositoryImpl) GetByID(id uint) (*models.File, error) {
+func (r *fileRepository) GetByID(id uint) (*models.File, error) {
 	var file models.File
 	if err := r.db.First(&file, id).Error; err != nil {
 		return nil, err
@@ -39,17 +38,17 @@ func (r *fileRepositoryImpl) GetByID(id uint) (*models.File, error) {
 	return &file, nil
 }
 
-func (r *fileRepositoryImpl) Update(file *models.File) error {
+func (r *fileRepository) Update(file *models.File) error {
 	return r.db.Model(file).Clauses(clause.Returning{}).Updates(file).Error
 }
 
-func (r *fileRepositoryImpl) Delete(id uint) error {
+func (r *fileRepository) Delete(id uint) error {
 	var file models.File
 	file.ID = id
 	return r.db.Delete(&file).Error
 }
 
-func (r *fileRepositoryImpl) GetAll() ([]*models.File, error) {
+func (r *fileRepository) GetAll() ([]*models.File, error) {
 	var files []*models.File
 	if err := r.db.Find(&files).Error; err != nil {
 		return nil, err
@@ -57,7 +56,7 @@ func (r *fileRepositoryImpl) GetAll() ([]*models.File, error) {
 	return files, nil
 }
 
-func (r *fileRepositoryImpl) GetFiles(fileIDs []uint) ([]*models.File, error) {
+func (r *fileRepository) GetFiles(fileIDs []uint) ([]*models.File, error) {
 	var files []*models.File
 	if err := r.db.Where("id IN ?", fileIDs).Find(&files).Error; err != nil {
 		return nil, err
@@ -65,7 +64,7 @@ func (r *fileRepositoryImpl) GetFiles(fileIDs []uint) ([]*models.File, error) {
 	return files, nil
 }
 
-func (r *fileRepositoryImpl) DeleteFiles(fileIDs []uint) error {
+func (r *fileRepository) DeleteFiles(fileIDs []uint) error {
 	if len(fileIDs) == 0 {
 		return nil // No files to delete
 	}
@@ -77,7 +76,7 @@ func (r *fileRepositoryImpl) DeleteFiles(fileIDs []uint) error {
 	return nil
 }
 
-func (r *fileRepositoryImpl) GetFilesKeys(fileIDs []uint) ([]string, error) {
+func (r *fileRepository) GetFilesKeys(fileIDs []uint) ([]string, error) {
 	var files []*models.File
 	if err := r.db.Select("path").Where("id IN ?", fileIDs).Find(&files).Error; err != nil {
 		return nil, err

@@ -4,10 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/cache"
 	"github.com/imlargo/go-api-template/internal/models"
-	"github.com/imlargo/go-api-template/pkg/kv"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -20,34 +17,28 @@ type UserRepository interface {
 	Delete(id uint) error
 }
 
-type userRepositoryImpl struct {
-	db           *gorm.DB
-	cacheService kv.KeyValueStore
-	cacheKeys    *cache.CacheKeys
+type userRepository struct {
+	*Repository
 }
 
 func NewUserRepository(
-	db *gorm.DB,
-	cacheService kv.KeyValueStore,
-	cacheKeys *cache.CacheKeys,
+	r *Repository,
 ) UserRepository {
-	return &userRepositoryImpl{
-		db,
-		cacheService,
-		cacheKeys,
+	return &userRepository{
+		Repository: r,
 	}
 }
 
-func (r *userRepositoryImpl) Create(user *models.User) error {
+func (r *userRepository) Create(user *models.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *userRepositoryImpl) GetByID(id uint) (*models.User, error) {
+func (r *userRepository) GetByID(id uint) (*models.User, error) {
 
 	var user models.User
 
 	cacheKey := r.cacheKeys.UserByID(id)
-	if err := r.cacheService.GetJSON(cacheKey, &user); err == nil {
+	if err := r.cache.GetJSON(cacheKey, &user); err == nil {
 		return &user, nil
 	}
 
@@ -55,14 +46,14 @@ func (r *userRepositoryImpl) GetByID(id uint) (*models.User, error) {
 		return nil, err
 	}
 
-	if err := r.cacheService.Set(cacheKey, &user, 30*time.Minute); err != nil {
+	if err := r.cache.Set(cacheKey, &user, 30*time.Minute); err != nil {
 		log.Println("Cache set failed:", err.Error())
 	}
 
 	return &user, nil
 }
 
-func (r *userRepositoryImpl) Update(user *models.User) error {
+func (r *userRepository) Update(user *models.User) error {
 
 	if err := r.db.Model(user).Clauses(clause.Returning{}).Updates(user).Error; err != nil {
 		return err
@@ -73,7 +64,7 @@ func (r *userRepositoryImpl) Update(user *models.User) error {
 	return nil
 }
 
-func (r *userRepositoryImpl) Delete(id uint) error {
+func (r *userRepository) Delete(id uint) error {
 	if err := r.db.Delete(&models.User{}, id).Error; err != nil {
 		return err
 	}
@@ -83,7 +74,7 @@ func (r *userRepositoryImpl) Delete(id uint) error {
 	return nil
 }
 
-func (r *userRepositoryImpl) GetAll() ([]*models.User, error) {
+func (r *userRepository) GetAll() ([]*models.User, error) {
 	var users []*models.User
 	if err := r.db.Find(&users).Error; err != nil {
 		return nil, err
@@ -91,7 +82,7 @@ func (r *userRepositoryImpl) GetAll() ([]*models.User, error) {
 	return users, nil
 }
 
-func (r *userRepositoryImpl) GetByEmail(email string) (*models.User, error) {
+func (r *userRepository) GetByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
@@ -99,9 +90,9 @@ func (r *userRepositoryImpl) GetByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *userRepositoryImpl) invalidateCache(userID uint) {
+func (r *userRepository) invalidateCache(userID uint) {
 	cacheKey := r.cacheKeys.UserByID(userID)
-	if err := r.cacheService.Delete(cacheKey); err != nil {
+	if err := r.cache.Delete(cacheKey); err != nil {
 		log.Println("Cache delete failed:", err.Error())
 	}
 }

@@ -1,10 +1,7 @@
 package store
 
 import (
-	"github.com/imlargo/go-api-template/internal/cache"
 	"github.com/imlargo/go-api-template/internal/repositories"
-	"github.com/imlargo/go-api-template/pkg/kv"
-	"gorm.io/gorm"
 )
 
 type Store struct {
@@ -14,11 +11,11 @@ type Store struct {
 	Users             repositories.UserRepository
 }
 
-func NewStorage(db *gorm.DB, cacheService kv.KeyValueStore, cacheKeys *cache.CacheKeys) *Store {
+func NewStorage(container *repositories.Repository) *Store {
 	return &Store{
-		Files:             repositories.NewFileRepository(db),
-		Notifications:     repositories.NewNotificationRepository(db),
-		PushSubscriptions: repositories.NewPushSubscriptionRepository(db),
-		Users:             repositories.NewUserRepository(db, cacheService, cacheKeys),
+		Files:             repositories.NewFileRepository(container),
+		Notifications:     repositories.NewNotificationRepository(container),
+		PushSubscriptions: repositories.NewPushSubscriptionRepository(container),
+		Users:             repositories.NewUserRepository(container),
 	}
 }

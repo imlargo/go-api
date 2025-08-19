@@ -10,6 +10,7 @@ import (
 	"github.com/imlargo/go-api-template/internal/config"
 	postgres "github.com/imlargo/go-api-template/internal/database"
 	"github.com/imlargo/go-api-template/internal/metrics"
+	"github.com/imlargo/go-api-template/internal/repositories"
 	"github.com/imlargo/go-api-template/internal/store"
 	"github.com/imlargo/go-api-template/pkg/kv"
 	"github.com/imlargo/go-api-template/pkg/ratelimiter"
@@ -38,6 +39,15 @@ func main() {
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
 	defer logger.Sync()
+
+	// Rate Limiter
+	if cfg.RateLimiter.Enabled {
+		logger.Infof("Initializing rate limiter with config: %s request every %.2f seconds", strconv.Itoa(cfg.RateLimiter.RequestsPerTimeFrame), cfg.RateLimiter.TimeFrame.Seconds())
+	}
+	rateLimiter := ratelimiter.NewTokenBucketLimiter(ratelimiter.Config{
+		RequestsPerTimeFrame: cfg.RateLimiter.RequestsPerTimeFrame,
+		TimeFrame:            cfg.RateLimiter.TimeFrame,
+	})
 
 	// Database
 	db, err := postgres.NewPostgres(cfg.Database.URL)
@@ -72,16 +82,8 @@ func main() {
 	cacheKeys := cache.NewCacheKeys(kv.NewBuilder("api", "v1"))
 
 	// Repositories
-	store := store.NewStorage(db, cacheService, cacheKeys)
-
-	// Rate Limiter
-	if cfg.RateLimiter.Enabled {
-		logger.Infof("Initializing rate limiter with config: %s request every %.2f seconds", strconv.Itoa(cfg.RateLimiter.RequestsPerTimeFrame), cfg.RateLimiter.TimeFrame.Seconds())
-	}
-	rateLimiter := ratelimiter.NewTokenBucketLimiter(ratelimiter.Config{
-		RequestsPerTimeFrame: cfg.RateLimiter.RequestsPerTimeFrame,
-		TimeFrame:            cfg.RateLimiter.TimeFrame,
-	})
+	repositoryContainer := repositories.NewRepository(db, cacheKeys, cacheService, logger)
+	store := store.NewStorage(repositoryContainer)
 
 	// Metrics
 	metricsService := metrics.NewPrometheusMetrics()

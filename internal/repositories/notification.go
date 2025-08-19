@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/imlargo/go-api-template/internal/models"
-	"gorm.io/gorm"
 )
 
 type NotificationRepository interface {
@@ -14,12 +13,12 @@ type NotificationRepository interface {
 }
 
 type notificationRepositoryImpl struct {
-	db *gorm.DB
+	*Repository
 }
 
-func NewNotificationRepository(db *gorm.DB) NotificationRepository {
+func NewNotificationRepository(r *Repository) NotificationRepository {
 	return &notificationRepositoryImpl{
-		db: db,
+		Repository: r,
 	}
 }
 

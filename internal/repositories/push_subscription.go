@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/imlargo/go-api-template/internal/models"
-	"gorm.io/gorm"
 )
 
 type PushNotificationSubscriptionRepository interface {
@@ -13,12 +12,12 @@ type PushNotificationSubscriptionRepository interface {
 }
 
 type pushSubscriptionRepositoryImpl struct {
-	db *gorm.DB
+	*Repository
 }
 
-func NewPushSubscriptionRepository(db *gorm.DB) PushNotificationSubscriptionRepository {
+func NewPushSubscriptionRepository(r *Repository) PushNotificationSubscriptionRepository {
 	return &pushSubscriptionRepositoryImpl{
-		db: db,
+		Repository: r,
 	}
 }
 
