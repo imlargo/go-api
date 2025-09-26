@@ -56,14 +56,18 @@ func main() {
 	}
 
 	// Storage
-	storage, err := storage.NewR2Storage(storage.StorageConfig{
-		BucketName:      cfg.Storage.BucketName,
-		AccountID:       cfg.Storage.AccountID,
-		AccessKeyID:     cfg.Storage.AccessKeyID,
-		SecretAccessKey: cfg.Storage.SecretAccessKey,
-		PublicDomain:    cfg.Storage.PublicDomain,
-		UsePublicURL:    cfg.Storage.UsePublicURL,
-	})
+	fileStorage := storage.NewEmptyStorage()
+	if cfg.Storage.Enabled {
+		fileStorage, err = storage.NewR2Storage(storage.StorageConfig{
+			BucketName:      cfg.Storage.BucketName,
+			AccountID:       cfg.Storage.AccountID,
+			AccessKeyID:     cfg.Storage.AccessKeyID,
+			SecretAccessKey: cfg.Storage.SecretAccessKey,
+			PublicDomain:    cfg.Storage.PublicDomain,
+			UsePublicURL:    cfg.Storage.UsePublicURL,
+		})
+	}
+
 	if err != nil {
 		logger.Fatal("Could not initialize storage service: ", err)
 		return
@@ -93,7 +97,7 @@ func main() {
 	app := &internal.Application{
 		Config:      cfg,
 		Store:       store,
-		Storage:     storage,
+		Storage:     fileStorage,
 		Metrics:     metricsService,
 		Cache:       cacheService,
 		CacheKeys:   cacheKeys,

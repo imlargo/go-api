@@ -47,6 +47,7 @@ type DbConfig struct {
 }
 
 type StorageConfig struct {
+	Enabled         bool
 	BucketName      string
 	AccountID       string
 	AccessKeyID     string
@@ -90,6 +91,7 @@ func LoadConfig() AppConfig {
 			RefreshExpiration: time.Duration(env.GetEnvInt(JWT_REFRESH_EXPIRATION, 10080)) * time.Minute,
 		},
 		Storage: StorageConfig{
+			Enabled:         env.GetEnvBool(STORAGE_ENABLED, false),
 			BucketName:      env.GetEnvString(STORAGE_BUCKET_NAME, ""),
 			AccountID:       env.GetEnvString(STORAGE_ACCOUNT_ID, ""),
 			AccessKeyID:     env.GetEnvString(STORAGE_ACCESS_KEY_ID, ""),
