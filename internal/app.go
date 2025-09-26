@@ -71,15 +71,27 @@ func (app *Application) Mount() {
 	metricsMiddleware := middleware.NewMetricsMiddleware(app.Metrics)
 	rateLimiterMiddleware := middleware.NewRateLimiterMiddleware(app.RateLimiter)
 	corsMiddleware := middleware.NewCorsMiddleware(app.Config.Server.Host, []string{"http://localhost:5173"})
+	
+	// Enhanced security and observability middlewares
+	requestIDMiddleware := middleware.RequestIDMiddleware()
+	securityMiddleware := middleware.SecurityHeadersMiddleware()
+	loggingMiddleware := middleware.StructuredLoggingMiddleware(app.Logger)
+	errorMiddleware := middleware.ErrorHandlingMiddleware(app.Logger)
+	requestSizeMiddleware := middleware.RequestSizeLimitMiddleware(10 * 1024 * 1024) // 10MB limit
 
 	// Metrics
 	app.Router.GET("/internal/metrics", middleware.BearerApiKeyMiddleware(app.Config.Auth.ApiKey), gin.WrapH(promhttp.Handler()))
 
-	// Register middlewares
-	app.Router.Use(metricsMiddleware)
-	app.Router.Use(corsMiddleware)
+	// Register global middlewares (order matters!)
+	app.Router.Use(requestIDMiddleware)     // First: Add request ID for tracing
+	app.Router.Use(securityMiddleware)     // Security headers
+	app.Router.Use(corsMiddleware)         // CORS handling
+	app.Router.Use(requestSizeMiddleware)  // Request size limits
+	app.Router.Use(loggingMiddleware)      // Request logging
+	app.Router.Use(errorMiddleware)        // Error handling and panic recovery
+	app.Router.Use(metricsMiddleware)      // Metrics collection
 	if app.Config.RateLimiter.Enabled {
-		app.Router.Use(rateLimiterMiddleware)
+		app.Router.Use(rateLimiterMiddleware) // Rate limiting
 	}
 
 	app.registerDocs()
