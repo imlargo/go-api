@@ -62,8 +62,9 @@ import (
 type {{.Name}}Repository interface {
 	Create({{.LowerName}} *models.{{.Name}}) error
 	GetAll() ([]*models.{{.Name}}, error)
-	GetByID(id uint) (*models.{{.Name}}, error)
+	Get(id uint) (*models.{{.Name}}, error)
 	Update({{.LowerName}} *models.{{.Name}}) error
+	Patch(id uint, data *map[string]interface{}) error
 	Delete(id uint) error
 }
 
@@ -83,20 +84,11 @@ func (r *{{.LowerName}}Repository) Create({{.LowerName}} *models.{{.Name}}) erro
 	return r.db.Create({{.LowerName}}).Error
 }
 
-func (r *{{.LowerName}}Repository) GetByID(id uint) (*models.{{.Name}}, error) {
+func (r *{{.LowerName}}Repository) Get(id uint) (*models.{{.Name}}, error) {
 	var {{.LowerName}} models.{{.Name}}
-
-	cacheKey := r.cacheKeys.{{.Name}}ByID(id)
-	if err := r.cache.GetJSON(cacheKey, &{{.LowerName}}); err == nil {
-		return &{{.LowerName}}, nil
-	}
 
 	if err := r.db.First(&{{.LowerName}}, id).Error; err != nil {
 		return nil, err
-	}
-
-	if err := r.cache.Set(cacheKey, &{{.LowerName}}, 30*time.Minute); err != nil {
-		log.Println("Cache set failed:", err.Error())
 	}
 
 	return &{{.LowerName}}, nil
@@ -107,7 +99,13 @@ func (r *{{.LowerName}}Repository) Update({{.LowerName}} *models.{{.Name}}) erro
 		return err
 	}
 
-	r.invalidateCache({{.LowerName}}.ID)
+	return nil
+}
+
+func (r *{{.LowerName}}Repository) Patch(id uint, data *map[string]interface{}) error {
+	if err := r.db.Model(&models.{{.Name}}{}).Where("id = ?", id).Updates(data).Error; err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -116,8 +114,6 @@ func (r *{{.LowerName}}Repository) Delete(id uint) error {
 	if err := r.db.Delete(&models.{{.Name}}{}, id).Error; err != nil {
 		return err
 	}
-
-	r.invalidateCache(id)
 
 	return nil
 }
@@ -128,13 +124,6 @@ func (r *{{.LowerName}}Repository) GetAll() ([]*models.{{.Name}}, error) {
 		return nil, err
 	}
 	return {{.LowerName}}s, nil
-}
-
-func (r *{{.LowerName}}Repository) invalidateCache({{.LowerName}}ID uint) {
-	cacheKey := r.cacheKeys.{{.Name}}ByID({{.LowerName}}ID)
-	if err := r.cache.Delete(cacheKey); err != nil {
-		log.Println("Cache delete failed:", err.Error())
-	}
 }
 `
 
