@@ -1,0 +1,39 @@
+# Configuration file for go-api
+# This file follows a strict schema with validation
+# Environment variables will override any values set here
+
+server:
+  host: localhost
+  port: "8000"
+
+database:
+  url: postgres://user:password@localhost/dbname?sslmode=disable
+
+rate_limiter:
+  requests_per_time_frame: 100
+  time_frame: 60s
+  enabled: true
+
+push_notification:
+  vapid_public_key: "your-vapid-public-key"
+  vapid_private_key: "your-vapid-private-key"
+
+auth:
+  # api_key: "your-api-key"  # Optional
+  jwt_secret: "your-secret-key"
+  jwt_issuer: "your-app"
+  jwt_audience: "your-app-users"
+  token_expiration: 15m
+  refresh_expiration: 168h  # 7 days
+
+storage:
+  enabled: false
+  bucket_name: "my-bucket"
+  account_id: "account-id"
+  access_key_id: "access-key"
+  secret_access_key: "secret-key"
+  # public_domain: "https://cdn.example.com"  # Optional
+  use_public_url: true
+
+redis:
+  url: "redis://localhost:6379"
