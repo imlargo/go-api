@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api-template/internal/metrics"
+	"github.com/imlargo/go-api/internal/metrics"
 )
 
 func NewMetricsMiddleware(metrics metrics.MetricsService) gin.HandlerFunc {

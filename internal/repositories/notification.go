@@ -3,7 +3,7 @@ package repositories
 import (
 	"time"
 
-	"github.com/imlargo/go-api-template/internal/models"
+	"github.com/imlargo/go-api/internal/models"
 )
 
 type NotificationRepository interface {

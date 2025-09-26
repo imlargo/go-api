@@ -1,4 +1,4 @@
-module github.com/imlargo/go-api-template
+module github.com/imlargo/go-api
 
 go 1.24.4
 

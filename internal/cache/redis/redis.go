@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/imlargo/go-api-template/pkg/kv"
+	"github.com/imlargo/go-api/pkg/kv"
 	"github.com/redis/go-redis/v9"
 )
 

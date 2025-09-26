@@ -53,19 +53,19 @@ const docTemplate = `{
                     "200": {
                         "description": "File uploaded successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.File"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.File"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -103,7 +103,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.CreatePresignedUrl"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.CreatePresignedUrl"
                         }
                     }
                 ],
@@ -111,13 +111,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -154,25 +154,25 @@ const docTemplate = `{
                     "200": {
                         "description": "File retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.File"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.File"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "File Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -207,13 +207,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -256,19 +256,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "File Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -305,13 +305,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -339,13 +339,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -376,7 +376,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.PushNotificationRequestPayload"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.PushNotificationRequestPayload"
                         }
                     }
                 ],
@@ -384,13 +384,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -436,13 +436,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -479,25 +479,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Push Notification Subscription",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.PushNotificationSubscription"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.PushNotificationSubscription"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -534,13 +534,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -571,7 +571,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.SendNotificationRequestPayload"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.SendNotificationRequestPayload"
                         }
                     }
                 ],
@@ -579,13 +579,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -629,13 +629,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -663,7 +663,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -694,7 +694,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.NotificationSubscriptionPayload"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.NotificationSubscriptionPayload"
                         }
                     }
                 ],
@@ -702,13 +702,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -739,7 +739,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.LoginUser"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.LoginUser"
                         }
                     }
                 ],
@@ -747,19 +747,19 @@ const docTemplate = `{
                     "200": {
                         "description": "User logged in successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.UserAuthResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.UserAuthResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -784,19 +784,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Authenticated user's",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.User"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -827,7 +827,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.RegisterUser"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.RegisterUser"
                         }
                     }
                 ],
@@ -835,19 +835,19 @@ const docTemplate = `{
                     "200": {
                         "description": "User registered successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.UserAuthResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.UserAuthResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_responses.ErrorResponse"
+                            "$ref": "#/definitions/github_com_imlargo_go-api_internal_responses.ErrorResponse"
                         }
                     }
                 }
@@ -855,7 +855,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_imlargo_go-api-template_internal_dto.AuthTokens": {
+        "github_com_imlargo_go-api_internal_dto.AuthTokens": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -869,7 +869,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.CreatePresignedUrl": {
+        "github_com_imlargo_go-api_internal_dto.CreatePresignedUrl": {
             "type": "object",
             "properties": {
                 "expiry_minutes": {
@@ -877,7 +877,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.LoginUser": {
+        "github_com_imlargo_go-api_internal_dto.LoginUser": {
             "type": "object",
             "required": [
                 "email",
@@ -892,7 +892,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.NotificationSubscriptionPayload": {
+        "github_com_imlargo_go-api_internal_dto.NotificationSubscriptionPayload": {
             "type": "object",
             "properties": {
                 "device_id": {
@@ -903,7 +903,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.PushNotificationRequestPayload": {
+        "github_com_imlargo_go-api_internal_dto.PushNotificationRequestPayload": {
             "type": "object",
             "properties": {
                 "category": {
@@ -920,7 +920,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.RegisterUser": {
+        "github_com_imlargo_go-api_internal_dto.RegisterUser": {
             "type": "object",
             "properties": {
                 "email": {
@@ -934,7 +934,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.SendNotificationRequestPayload": {
+        "github_com_imlargo_go-api_internal_dto.SendNotificationRequestPayload": {
             "type": "object",
             "required": [
                 "notification",
@@ -942,25 +942,25 @@ const docTemplate = `{
             ],
             "properties": {
                 "notification": {
-                    "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.Notification"
+                    "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.Notification"
                 },
                 "user_id": {
                     "type": "integer"
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_dto.UserAuthResponse": {
+        "github_com_imlargo_go-api_internal_dto.UserAuthResponse": {
             "type": "object",
             "properties": {
                 "tokens": {
-                    "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_dto.AuthTokens"
+                    "$ref": "#/definitions/github_com_imlargo_go-api_internal_dto.AuthTokens"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_models.User"
+                    "$ref": "#/definitions/github_com_imlargo_go-api_internal_models.User"
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_enums.NotificationType": {
+        "github_com_imlargo_go-api_internal_enums.NotificationType": {
             "type": "string",
             "enum": [
                 "base"
@@ -969,7 +969,7 @@ const docTemplate = `{
                 "NotificationTypeBase"
             ]
         },
-        "github_com_imlargo_go-api-template_internal_models.File": {
+        "github_com_imlargo_go-api_internal_models.File": {
             "type": "object",
             "properties": {
                 "content_type": {
@@ -998,11 +998,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_models.Notification": {
+        "github_com_imlargo_go-api_internal_models.Notification": {
             "type": "object",
             "properties": {
                 "category": {
-                    "$ref": "#/definitions/github_com_imlargo_go-api-template_internal_enums.NotificationType"
+                    "$ref": "#/definitions/github_com_imlargo_go-api_internal_enums.NotificationType"
                 },
                 "created_at": {
                     "type": "string"
@@ -1024,7 +1024,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_models.PushNotificationSubscription": {
+        "github_com_imlargo_go-api_internal_models.PushNotificationSubscription": {
             "type": "object",
             "properties": {
                 "auth": {
@@ -1047,7 +1047,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_models.User": {
+        "github_com_imlargo_go-api_internal_models.User": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1067,7 +1067,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_imlargo_go-api-template_internal_responses.ErrorResponse": {
+        "github_com_imlargo_go-api_internal_responses.ErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {

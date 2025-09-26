@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/imlargo/go-api-template/internal/cache"
-	"github.com/imlargo/go-api-template/internal/config"
-	"github.com/imlargo/go-api-template/internal/store"
-	"github.com/imlargo/go-api-template/pkg/kv"
+	"github.com/imlargo/go-api/internal/cache"
+	"github.com/imlargo/go-api/internal/config"
+	"github.com/imlargo/go-api/internal/store"
+	"github.com/imlargo/go-api/pkg/kv"
 	"go.uber.org/zap"
 )
 
