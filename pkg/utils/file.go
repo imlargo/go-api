@@ -19,7 +19,7 @@ func ExtractFileNameFromURL(urlStr string) (filename, extension string, err erro
 
 	// Extract the file name from the path
 	fileName := path.Base(fullPath)
-	fileName = normalizeString(fileName)
+	fileName = normalizeFilename(fileName)
 
 	// If there is no file in the URL, return empty
 	if fileName == "/" || fileName == "." {
@@ -43,7 +43,7 @@ func ExtractFileNameFromURL(urlStr string) (filename, extension string, err erro
 // ExtractFileName extracts the file name and extension from a full filename.
 func ExtractFileName(fullFilename string) (filename, extension string) {
 
-	normalized := normalizeString(fullFilename)
+	normalized := normalizeFilename(fullFilename)
 
 	// Extract the extension
 	ext := filepath.Ext(normalized)
@@ -131,7 +131,7 @@ func ResolveContentTypeExtension(contentType string) string {
 	}
 }
 
-func normalizeString(filename string) string {
+func normalizeFilename(filename string) string {
 	filename = strings.TrimSpace(filename)
 	filename = strings.ToLower(filename)
 	filename = strings.ReplaceAll(filename, " ", "-")

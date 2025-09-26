@@ -26,7 +26,7 @@ func (ck *CacheKeys) IsUserSeller(userID uint) string {
 	return ck.builder.BuildForQuery("user", "is_seller", params)
 }
 
-func (ck *CacheKeys) AccountSociaMediaViewsByDateRange(accountID uint, startDate, endDate time.Time) string {
+func (ck *CacheKeys) AccountSocialMediaViewsByDateRange(accountID uint, startDate, endDate time.Time) string {
 	params := map[string]interface{}{
 		"account_id": accountID,
 		"start_date": startDate.Format("2006-01-02"),
@@ -35,7 +35,7 @@ func (ck *CacheKeys) AccountSociaMediaViewsByDateRange(accountID uint, startDate
 	return ck.builder.BuildForQuery("account", "social_media_views", params)
 }
 
-func (ck *CacheKeys) ClientSociaMediaViewsByDateRange(clientID uint, startDate, endDate time.Time) string {
+func (ck *CacheKeys) ClientSocialMediaViewsByDateRange(clientID uint, startDate, endDate time.Time) string {
 	params := map[string]interface{}{
 		"client_id":  clientID,
 		"start_date": startDate.Format("2006-01-02"),
@@ -44,7 +44,7 @@ func (ck *CacheKeys) ClientSociaMediaViewsByDateRange(clientID uint, startDate, 
 	return ck.builder.BuildForQuery("client", "social_media_views", params)
 }
 
-func (ck *CacheKeys) UserSociaMediaViewsByDateRange(userID uint, startDate, endDate time.Time) string {
+func (ck *CacheKeys) UserSocialMediaViewsByDateRange(userID uint, startDate, endDate time.Time) string {
 	params := map[string]interface{}{
 		"user_id":    userID,
 		"start_date": startDate.Format("2006-01-02"),
