@@ -146,6 +146,13 @@ definitions:
       status:
         type: string
     type: object
+  internal_handlers.HealthResponse:
+    properties:
+      code:
+        type: integer
+      status:
+        type: string
+    type: object
   webpush.Keys:
     properties:
       auth:
@@ -694,6 +701,19 @@ paths:
       summary: Register user
       tags:
       - auth
+  /health:
+    get:
+      description: Returns the current status of the API service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.HealthResponse'
+      summary: Check API health status
+      tags:
+      - Health
 securityDefinitions:
   BearerAuth:
     in: header

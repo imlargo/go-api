@@ -852,6 +852,26 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns the current status of the API service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Check API health status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.HealthResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1075,6 +1095,17 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
