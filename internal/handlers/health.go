@@ -9,11 +9,6 @@ type HealthHandler struct {
 	*Handler
 }
 
-type HealthResponse struct {
-	Status string `json:"status"`
-	Code   int    `json:"code"`
-}
-
 func NewHealthHandler(handler *Handler) *HealthHandler {
 	return &HealthHandler{
 		Handler: handler,
@@ -28,8 +23,5 @@ func NewHealthHandler(handler *Handler) *HealthHandler {
 // @Success 200 {object} HealthResponse
 // @Router /health [get]
 func (h *HealthHandler) HealthCheck(c *gin.Context) {
-	responses.Ok(c, HealthResponse{
-		Status: "OK",
-		Code:   200,
-	})
+	responses.Ok(c, "ok")
 }
