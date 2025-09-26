@@ -100,6 +100,8 @@ func main() {
 		RateLimiter: rateLimiter,
 		Router:      router,
 		Logger:      logger,
+		DB:          db,
+		Redis:       cacheProvider,
 	}
 
 	app.Mount()

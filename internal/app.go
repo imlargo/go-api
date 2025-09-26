@@ -18,6 +18,7 @@ import (
 	"github.com/imlargo/go-api/pkg/storage"
 	"github.com/imlargo/go-api/pkg/utils"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -34,6 +35,8 @@ type Application struct {
 	RateLimiter ratelimiter.RateLimiter
 	Logger      *zap.SugaredLogger
 	Router      *gin.Engine
+	DB          *gorm.DB
+	Redis       interface{ Ping() error }
 }
 
 func (app *Application) Mount() {
@@ -60,6 +63,7 @@ func (app *Application) Mount() {
 	authHandler := handlers.NewAuthHandler(handlerContainer, authService)
 	notificationHandler := handlers.NewNotificationHandler(handlerContainer, notificationService)
 	fileHandler := handlers.NewFileHandler(handlerContainer, fileService)
+	healthHandler := handlers.NewHealthHandler(handlerContainer, app.DB, app.Redis)
 
 	// Middlewares
 	apiKeyMiddleware := middleware.ApiKeyMiddleware(app.Config.Auth.ApiKey)
@@ -79,6 +83,11 @@ func (app *Application) Mount() {
 	}
 
 	app.registerDocs()
+
+	// Health endpoints (no auth required)
+	app.Router.GET("/health", healthHandler.Health)
+	app.Router.GET("/ready", healthHandler.Readiness)
+	app.Router.GET("/live", healthHandler.Liveness)
 
 	// Routes
 	app.Router.POST("/auth/login", authHandler.Login)
