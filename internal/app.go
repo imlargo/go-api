@@ -60,6 +60,7 @@ func (app *Application) Mount() {
 	authHandler := handlers.NewAuthHandler(handlerContainer, authService)
 	notificationHandler := handlers.NewNotificationHandler(handlerContainer, notificationService)
 	fileHandler := handlers.NewFileHandler(handlerContainer, fileService)
+	healthHandler := handlers.NewHealthHandler(handlerContainer)
 
 	// Middlewares
 	apiKeyMiddleware := middleware.ApiKeyMiddleware(app.Config.Auth.ApiKey)
@@ -79,6 +80,9 @@ func (app *Application) Mount() {
 	}
 
 	app.registerDocs()
+
+	// Health endpoint
+	app.Router.GET("/health", healthHandler.HealthCheck)
 
 	// Routes
 	app.Router.POST("/auth/login", authHandler.Login)
