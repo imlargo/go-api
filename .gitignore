@@ -46,3 +46,11 @@ logs
 
 # Generated binaries
 main
+
+# Configuration files (exclude sensitive configs, include examples)
+config.yaml
+config.yml
+configs/config.yaml
+configs/config.yml
+!config.example.yaml
+!config.example.yml

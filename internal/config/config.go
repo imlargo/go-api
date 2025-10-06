@@ -1,106 +1,84 @@
 package config
 
 import (
+	"log"
 	"time"
-
-	"github.com/imlargo/go-api/pkg/env"
 )
 
 type AppConfig struct {
-	Server           ServerConfig
-	Database         DbConfig
-	RateLimiter      RateLimiterConfig
-	PushNotification PushNotificationConfig
-	Auth             AuthConfig
-	Storage          StorageConfig
-	Redis            RedisConfig
+	Server           ServerConfig           `yaml:"server" validate:"required"`
+	Database         DbConfig               `yaml:"database" validate:"required"`
+	RateLimiter      RateLimiterConfig      `yaml:"rate_limiter" validate:"required"`
+	PushNotification PushNotificationConfig `yaml:"push_notification" validate:"required"`
+	Auth             AuthConfig             `yaml:"auth" validate:"required"`
+	Storage          StorageConfig          `yaml:"storage" validate:"required"`
+	Redis            RedisConfig            `yaml:"redis" validate:"required"`
 }
 
 type ServerConfig struct {
-	Host string
-	Port string
+	Host string `yaml:"host" validate:"required" example:"localhost"`
+	Port string `yaml:"port" validate:"required" example:"8000"`
 }
 
 type RateLimiterConfig struct {
-	RequestsPerTimeFrame int
-	TimeFrame            time.Duration
-	Enabled              bool
+	RequestsPerTimeFrame int           `yaml:"requests_per_time_frame" validate:"min=0" example:"100"`
+	TimeFrame            time.Duration `yaml:"time_frame" validate:"min=0" example:"60s"`
+	Enabled              bool          `yaml:"enabled" example:"true"`
 }
 
 type PushNotificationConfig struct {
-	VAPIDPublicKey  string
-	VAPIDPrivateKey string
+	VAPIDPublicKey  string `yaml:"vapid_public_key" validate:"required" example:"your-vapid-public-key"`
+	VAPIDPrivateKey string `yaml:"vapid_private_key" validate:"required" example:"your-vapid-private-key"`
 }
 
 type AuthConfig struct {
-	ApiKey string
+	ApiKey string `yaml:"api_key,omitempty" example:"your-api-key"`
 
-	JwtSecret         string
-	JwtIssuer         string
-	JwtAudience       string
-	TokenExpiration   time.Duration
-	RefreshExpiration time.Duration
+	JwtSecret         string        `yaml:"jwt_secret" validate:"required" example:"your-secret-key"`
+	JwtIssuer         string        `yaml:"jwt_issuer" validate:"required" example:"your-app"`
+	JwtAudience       string        `yaml:"jwt_audience" validate:"required" example:"your-app-users"`
+	TokenExpiration   time.Duration `yaml:"token_expiration" validate:"min=1m" example:"15m"`
+	RefreshExpiration time.Duration `yaml:"refresh_expiration" validate:"min=1h" example:"168h"`
 }
 
 type DbConfig struct {
-	URL string
+	URL string `yaml:"url" validate:"required" example:"postgres://user:password@localhost/dbname?sslmode=disable"`
 }
 
 type StorageConfig struct {
-	Enabled         bool
-	BucketName      string
-	AccountID       string
-	AccessKeyID     string
-	SecretAccessKey string
-	PublicDomain    string // Optional domain
-	UsePublicURL    bool   // Use public URL for accessing files
+	Enabled         bool   `yaml:"enabled" example:"true"`
+	BucketName      string `yaml:"bucket_name" validate:"required_if=Enabled true" example:"my-bucket"`
+	AccountID       string `yaml:"account_id" validate:"required_if=Enabled true" example:"account-id"`
+	AccessKeyID     string `yaml:"access_key_id" validate:"required_if=Enabled true" example:"access-key"`
+	SecretAccessKey string `yaml:"secret_access_key" validate:"required_if=Enabled true" example:"secret-key"`
+	PublicDomain    string `yaml:"public_domain,omitempty" example:"https://cdn.example.com"`
+	UsePublicURL    bool   `yaml:"use_public_url" example:"true"`
 }
 
 type RedisConfig struct {
-	RedisURL string
+	RedisURL string `yaml:"url" validate:"required" example:"redis://localhost:6379"`
 }
 
 func LoadConfig() AppConfig {
+	// Try to load .env file for environment variables
 	err := loadEnv()
 	if err != nil {
-		panic("Error loading environment variables: " + err.Error())
+		log.Printf("Warning: %v", err)
 	}
 
-	return AppConfig{
-		Server: ServerConfig{
-			Host: env.GetEnvString(API_URL, "localhost"),
-			Port: env.GetEnvString(PORT, "8000"),
-		},
-		Database: DbConfig{
-			URL: env.GetEnvString(DATABASE_URL, ""),
-		},
-		RateLimiter: RateLimiterConfig{
-			RequestsPerTimeFrame: env.GetEnvInt(RATE_LIMIT_MAX_REQUESTS, 0),
-			TimeFrame:            time.Duration(env.GetEnvInt(RATE_LIMIT_TIMEFRAME, 0)) * time.Second,
-			Enabled:              env.GetEnvInt(RATE_LIMIT_MAX_REQUESTS, 0) != 0 && env.GetEnvInt(RATE_LIMIT_TIMEFRAME, 0) != 0,
-		},
-		PushNotification: PushNotificationConfig{
-			VAPIDPublicKey:  env.GetEnvString(VAPID_PUBLIC_KEY, ""),
-			VAPIDPrivateKey: env.GetEnvString(VAPID_PRIVATE_KEY, ""),
-		},
-		Auth: AuthConfig{
-			JwtSecret:         env.GetEnvString(JWT_SECRET, "your-secret-key"),
-			JwtIssuer:         env.GetEnvString(JWT_ISSUER, "your-app"),
-			JwtAudience:       env.GetEnvString(JWT_AUDIENCE, "your-app-users"),
-			TokenExpiration:   time.Duration(env.GetEnvInt(JWT_TOKEN_EXPIRATION, 15)) * time.Minute,
-			RefreshExpiration: time.Duration(env.GetEnvInt(JWT_REFRESH_EXPIRATION, 10080)) * time.Minute,
-		},
-		Storage: StorageConfig{
-			Enabled:         env.GetEnvBool(STORAGE_ENABLED, false),
-			BucketName:      env.GetEnvString(STORAGE_BUCKET_NAME, ""),
-			AccountID:       env.GetEnvString(STORAGE_ACCOUNT_ID, ""),
-			AccessKeyID:     env.GetEnvString(STORAGE_ACCESS_KEY_ID, ""),
-			SecretAccessKey: env.GetEnvString(STORAGE_SECRET_ACCESS_KEY, ""),
-			PublicDomain:    env.GetEnvString(STORAGE_PUBLIC_DOMAIN, ""),
-			UsePublicURL:    env.GetEnvBool(STORAGE_USE_PUBLIC_URL, false),
-		},
-		Redis: RedisConfig{
-			RedisURL: env.GetEnvString(REDIS_URL, ""),
-		},
+	// Try to load configuration from YAML files
+	for _, configPath := range GetDefaultConfigPaths() {
+		if config, err := LoadConfigFromYAML(configPath); err == nil {
+			return *config
+		}
 	}
+
+	// Fallback to environment variables only
+	log.Println("No YAML configuration found, using environment variables only")
+	config, err := LoadConfigFromYAML("") // Empty path forces env-only loading
+	if err != nil {
+		panic("Error loading configuration: " + err.Error())
+	}
+
+	return *config
 }
