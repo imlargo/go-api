@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/internal/dto"
-	_ "github.com/imlargo/go-api/internal/models"
-	"github.com/imlargo/go-api/internal/responses"
-	"github.com/imlargo/go-api/internal/services"
+	"github.com/nicolailuther/butter/internal/dto"
+	_ "github.com/nicolailuther/butter/internal/models"
+	"github.com/nicolailuther/butter/internal/responses"
+	"github.com/nicolailuther/butter/internal/services"
 )
 
 type AuthHandler struct {
@@ -25,20 +25,20 @@ func NewAuthHandler(handler *Handler, authService services.AuthService) *AuthHan
 // @Description	Login user with email and password
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	dto.LoginUser	true	"Login user request payload"
+// @Param		payload	body	dto.LoginUserRequest	true	"Login user request payload"
 // @Produce		json
-// @Success		200	{object}	dto.UserAuthResponse	"User logged in successfully"
+// @Success		200	{object}	dto.AuthResponse	"User logged in successfully"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
-func (h *AuthHandler) Login(c *gin.Context) {
-	var payload dto.LoginUser
+func (a *AuthHandler) Login(c *gin.Context) {
+	var payload dto.LoginUserRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return
 	}
 
-	authResponse, err := h.authService.Login(payload.Email, payload.Password)
+	authResponse, err := a.authService.Login(payload.Email, payload.Password)
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, err.Error())
 		return
@@ -52,20 +52,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Description	Register a new user with email, password, and other details
 // @Tags		auth
 // @Accept		json
-// @Param		payload	body	dto.RegisterUser	true	"Register user request payload"
+// @Param		payload	body	dto.RegisterUserRequest	true	"Register user request payload"
 // @Produce		json
-// @Success		200	{object}	dto.UserAuthResponse	"User registered successfully
+// @Success		200	{object}	dto.AuthResponse	"User registered successfully
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
-func (h *AuthHandler) Register(c *gin.Context) {
-	var payload dto.RegisterUser
+func (a *AuthHandler) Register(c *gin.Context) {
+	var payload dto.RegisterUserRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request payload")
 		return
 	}
 
-	authData, err := h.authService.Register(&payload)
+	authData, err := a.authService.Register(&payload)
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, err.Error())
 		return
@@ -83,18 +83,51 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Failure		401	{object}	responses.ErrorResponse	"Unauthorized"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error
 // @Security     BearerAuth
-func (h *AuthHandler) GetUserInfo(c *gin.Context) {
+func (a *AuthHandler) GetUserInfo(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		responses.ErrorUnauthorized(c, "User not authenticated")
 		return
 	}
 
-	user, err := h.authService.GetUser(userID.(uint))
+	user, err := a.authService.GetUserInfo(userID.(uint))
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, err.Error())
 		return
 	}
 
 	responses.Ok(c, user)
+}
+
+// @Summary		Change password
+// @Router			/auth/change-password [post]
+// @Description	Change the authenticated user's password
+// @Tags		auth
+// @Accept		json
+// @Param		payload	body	dto.ChangePasswordRequest	true	"Change password request payload"
+// @Produce		json
+// @Success		200	{object}	map[string]string	"Password changed successfully"
+// @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
+// @Failure		401	{object}	responses.ErrorResponse	"Unauthorized"
+// @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
+// @Security     BearerAuth
+func (a *AuthHandler) ChangePassword(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		responses.ErrorUnauthorized(c, "User not authenticated")
+		return
+	}
+
+	var payload dto.ChangePasswordRequest
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		responses.ErrorBadRequest(c, "Invalid request payload")
+		return
+	}
+
+	if err := a.authService.ChangePassword(userID.(uint), &payload); err != nil {
+		responses.ErrorInternalServerWithMessage(c, err.Error())
+		return
+	}
+
+	responses.Ok(c, gin.H{"message": "Password changed successfully"})
 }

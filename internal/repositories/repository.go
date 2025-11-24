@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/imlargo/go-api/internal/cache"
-	"github.com/imlargo/go-api/pkg/kv"
+	"github.com/nicolailuther/butter/internal/cache"
+	"github.com/nicolailuther/butter/pkg/kv"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

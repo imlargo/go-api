@@ -157,13 +157,12 @@ func (s *r2Storage) BulkDelete(keys []string) error {
 	}
 
 	ctx := context.Background()
-	const maxBatchSize = 1000 // R2/S3 limit for bulk delete operations
 
 	var allErrors []string
 
 	// Process files in batches
-	for i := 0; i < len(keys); i += maxBatchSize {
-		end := i + maxBatchSize
+	for i := 0; i < len(keys); i += MaxBatchSize {
+		end := i + MaxBatchSize
 		if end > len(keys) {
 			end = len(keys)
 		}

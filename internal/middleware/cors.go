@@ -29,6 +29,14 @@ func NewCorsMiddleware(host string, origins []string) gin.HandlerFunc {
 			"Accept",
 			"Authorization",
 			"Content-Type",
+			"X-Forwarded-For",
+			"X-Real-IP",
+			"X-Forwarded-Host",
+			"X-Forwarded-Proto",
+		},
+		ExposeHeaders: []string{
+			"Content-Length",
+			"Content-Type",
 		},
 	}
 

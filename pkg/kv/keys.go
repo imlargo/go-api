@@ -56,7 +56,7 @@ func (kb *DefaultKeyBuilder) BuildWithParams(prefix string, params map[string]in
 		return kb.Build(prefix)
 	}
 
-	paramsStr := kb.buildParameterString(params)
+	paramsStr := kb.buildParamsString(params)
 
 	// Hash parameter string if it exceeds maximum size
 	if len(paramsStr) > kb.maxParamSize {
@@ -88,8 +88,8 @@ func (kb *DefaultKeyBuilder) BuildPattern(parts ...string) string {
 	return key + kb.separator + "*"
 }
 
-// buildParameterString converts parameter map to a sorted, deterministic string representation
-func (kb *DefaultKeyBuilder) buildParameterString(params map[string]interface{}) string {
+// buildParamsString converts parameter map to a sorted, deterministic string representation
+func (kb *DefaultKeyBuilder) buildParamsString(params map[string]interface{}) string {
 	if len(params) == 0 {
 		return ""
 	}

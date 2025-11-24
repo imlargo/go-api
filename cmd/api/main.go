@@ -4,23 +4,23 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/internal"
-	"github.com/imlargo/go-api/internal/cache"
-	"github.com/imlargo/go-api/internal/cache/redis"
-	"github.com/imlargo/go-api/internal/config"
-	postgres "github.com/imlargo/go-api/internal/database"
-	"github.com/imlargo/go-api/internal/metrics"
-	"github.com/imlargo/go-api/internal/repositories"
-	"github.com/imlargo/go-api/internal/store"
-	"github.com/imlargo/go-api/pkg/kv"
-	"github.com/imlargo/go-api/pkg/ratelimiter"
-	"github.com/imlargo/go-api/pkg/storage"
+
+	"github.com/nicolailuther/butter/internal/cache"
+	"github.com/nicolailuther/butter/internal/cache/redis"
+	"github.com/nicolailuther/butter/internal/config"
+	"github.com/nicolailuther/butter/internal/database"
+	"github.com/nicolailuther/butter/internal/metrics"
+	"github.com/nicolailuther/butter/internal/repositories"
+	"github.com/nicolailuther/butter/internal/store"
+	"github.com/nicolailuther/butter/pkg/kv"
+	"github.com/nicolailuther/butter/pkg/ratelimiter"
+	"github.com/nicolailuther/butter/pkg/storage"
 	"go.uber.org/zap"
 )
 
-// @title Go api
+// @title Butter API
 // @version 1.0
-// @description Backend service template
+// @description Backend service for Butter
 
 // @contact.name Default
 // @contact.url https://default.dev
@@ -50,24 +50,20 @@ func main() {
 	})
 
 	// Database
-	db, err := postgres.NewPostgres(cfg.Database.URL)
+	db, err := database.NewPostgres(cfg.Database.URL)
 	if err != nil {
 		logger.Fatal("Could not initialize database: ", err)
 	}
 
 	// Storage
-	fileStorage := storage.NewEmptyStorage()
-	if cfg.Storage.Enabled {
-		fileStorage, err = storage.NewR2Storage(storage.StorageConfig{
-			BucketName:      cfg.Storage.BucketName,
-			AccountID:       cfg.Storage.AccountID,
-			AccessKeyID:     cfg.Storage.AccessKeyID,
-			SecretAccessKey: cfg.Storage.SecretAccessKey,
-			PublicDomain:    cfg.Storage.PublicDomain,
-			UsePublicURL:    cfg.Storage.UsePublicURL,
-		})
-	}
-
+	storage, err := storage.NewR2Storage(storage.StorageConfig{
+		BucketName:      cfg.Storage.BucketName,
+		AccountID:       cfg.Storage.AccountID,
+		AccessKeyID:     cfg.Storage.AccessKeyID,
+		SecretAccessKey: cfg.Storage.SecretAccessKey,
+		PublicDomain:    cfg.Storage.PublicDomain,
+		UsePublicURL:    cfg.Storage.UsePublicURL,
+	})
 	if err != nil {
 		logger.Fatal("Could not initialize storage service: ", err)
 		return
@@ -87,23 +83,56 @@ func main() {
 
 	// Repositories
 	repositoryContainer := repositories.NewRepository(db, cacheKeys, cacheService, logger)
-	store := store.NewStorage(repositoryContainer)
+	store := store.NewStorage(repositoryContainer, db)
 
 	// Metrics
 	metricsService := metrics.NewPrometheusMetrics()
 
 	router := gin.Default()
 
-	app := &internal.Application{
+	// Configure trusted proxies to properly handle X-Forwarded-For headers
+	// This is critical for users behind proxies (e.g., UK users)
+	// Trust Cloudflare and localhost only by default
+	// If deployed behind other reverse proxies, configure via environment
+	trustedProxies := []string{
+		"127.0.0.1", // localhost
+		"::1",       // localhost IPv6
+		// Cloudflare IP ranges (updated as of 2024)
+		"173.245.48.0/20",
+		"103.21.244.0/22",
+		"103.22.200.0/22",
+		"103.31.4.0/22",
+		"141.101.64.0/18",
+		"108.162.192.0/18",
+		"190.93.240.0/20",
+		"188.114.96.0/20",
+		"197.234.240.0/22",
+		"198.41.128.0/17",
+		"162.158.0.0/15",
+		"104.16.0.0/13",
+		"104.24.0.0/14",
+		"172.64.0.0/13",
+		"131.0.72.0/22",
+	}
+
+	// Only trust private networks if explicitly running in development mode
+	if gin.Mode() == gin.DebugMode {
+		trustedProxies = append(trustedProxies, "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+	}
+
+	router.SetTrustedProxies(trustedProxies)
+
+	app := &Application{
 		Config:      cfg,
 		Store:       store,
-		Storage:     fileStorage,
+		Storage:     storage,
 		Metrics:     metricsService,
 		Cache:       cacheService,
 		CacheKeys:   cacheKeys,
 		RateLimiter: rateLimiter,
 		Router:      router,
 		Logger:      logger,
+		RedisClient: redisClient,
 	}
 
 	app.Mount()

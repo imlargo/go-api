@@ -154,7 +154,7 @@ func (sm *sseManager) cleanupRoutine() {
 			case <-client.Context.Done():
 				toRemove = append(toRemove, clientID)
 			default:
-				// Verificar si la conexión está muy antigua
+				// Check if the connection is too old
 				if now.Sub(client.LastSeen) > 2*time.Minute {
 					client.Cancel()
 					toRemove = append(toRemove, clientID)

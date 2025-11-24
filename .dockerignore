@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Development files
+.vscode
+.idea
+
+# Build artifacts
+dist/
+build/
+main
+*.exe
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Temporary files
+tmp/
+temp/

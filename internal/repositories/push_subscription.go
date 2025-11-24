@@ -1,8 +1,6 @@
 package repositories
 
-import (
-	"github.com/imlargo/go-api/internal/models"
-)
+import "github.com/nicolailuther/butter/internal/models"
 
 type PushNotificationSubscriptionRepository interface {
 	Create(subscription *models.PushNotificationSubscription) error
@@ -11,21 +9,21 @@ type PushNotificationSubscriptionRepository interface {
 	GetByID(id uint) (*models.PushNotificationSubscription, error)
 }
 
-type pushSubscriptionRepositoryImpl struct {
+type pushSubscriptionRepository struct {
 	*Repository
 }
 
 func NewPushSubscriptionRepository(r *Repository) PushNotificationSubscriptionRepository {
-	return &pushSubscriptionRepositoryImpl{
+	return &pushSubscriptionRepository{
 		Repository: r,
 	}
 }
 
-func (r *pushSubscriptionRepositoryImpl) Create(subscription *models.PushNotificationSubscription) error {
+func (r *pushSubscriptionRepository) Create(subscription *models.PushNotificationSubscription) error {
 	return r.db.Create(subscription).Error
 }
 
-func (r *pushSubscriptionRepositoryImpl) GetSubscriptionsByUser(id uint) ([]*models.PushNotificationSubscription, error) {
+func (r *pushSubscriptionRepository) GetSubscriptionsByUser(id uint) ([]*models.PushNotificationSubscription, error) {
 	var subscriptions []*models.PushNotificationSubscription
 	if err := r.db.Where("user_id = ?", id).Find(&subscriptions).Error; err != nil {
 		return nil, err
@@ -33,14 +31,14 @@ func (r *pushSubscriptionRepositoryImpl) GetSubscriptionsByUser(id uint) ([]*mod
 	return subscriptions, nil
 }
 
-func (r *pushSubscriptionRepositoryImpl) Delete(id uint) error {
+func (r *pushSubscriptionRepository) Delete(id uint) error {
 	if err := r.db.Where("id = ?", id).Delete(&models.PushNotificationSubscription{}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *pushSubscriptionRepositoryImpl) GetByID(id uint) (*models.PushNotificationSubscription, error) {
+func (r *pushSubscriptionRepository) GetByID(id uint) (*models.PushNotificationSubscription, error) {
 	var subscription models.PushNotificationSubscription
 	if err := r.db.First(&subscription, id).Error; err != nil {
 		return nil, err

@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/imlargo/go-api/internal/models"
+	"github.com/nicolailuther/butter/internal/models"
 	"gorm.io/gorm/clause"
 )
 
@@ -15,6 +15,8 @@ type UserRepository interface {
 	GetByEmail(email string) (*models.User, error)
 	Update(user *models.User) error
 	Delete(id uint) error
+
+	GetUsersInCharge(userID uint) ([]*models.User, error)
 }
 
 type userRepository struct {
@@ -42,7 +44,7 @@ func (r *userRepository) GetByID(id uint) (*models.User, error) {
 		return &user, nil
 	}
 
-	if err := r.db.First(&user, id).Error; err != nil {
+	if err := r.db.Preload("Creator").First(&user, id).Error; err != nil {
 		return nil, err
 	}
 
@@ -88,6 +90,14 @@ func (r *userRepository) GetByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) GetUsersInCharge(userID uint) ([]*models.User, error) {
+	var users []*models.User
+	if err := r.db.Preload("AssignedClients").Where(&models.User{CreatedBy: userID}).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 func (r *userRepository) invalidateCache(userID uint) {

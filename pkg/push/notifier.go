@@ -37,7 +37,7 @@ func (p *pushNotifier) Send(subscription *Subscription, payload interface{}) err
 	}
 
 	resp, err := webpush.SendNotification(payloadBytes, sub, &webpush.Options{
-		Subscriber:      "",
+		Subscriber:      "https://app.hellobutter.io",
 		VAPIDPublicKey:  p.vapidPublicKey,
 		VAPIDPrivateKey: p.vapidPrivateKey,
 		TTL:             30,

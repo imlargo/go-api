@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/internal/responses"
+	"github.com/nicolailuther/butter/internal/responses"
 )
 
 func ApiKeyMiddleware(apiKey string) gin.HandlerFunc {

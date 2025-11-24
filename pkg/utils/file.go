@@ -1,8 +1,12 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -19,7 +23,7 @@ func ExtractFileNameFromURL(urlStr string) (filename, extension string, err erro
 
 	// Extract the file name from the path
 	fileName := path.Base(fullPath)
-	fileName = normalizeFilename(fileName)
+	fileName = normalizeString(fileName)
 
 	// If there is no file in the URL, return empty
 	if fileName == "/" || fileName == "." {
@@ -43,7 +47,7 @@ func ExtractFileNameFromURL(urlStr string) (filename, extension string, err erro
 // ExtractFileName extracts the file name and extension from a full filename.
 func ExtractFileName(fullFilename string) (filename, extension string) {
 
-	normalized := normalizeFilename(fullFilename)
+	normalized := normalizeString(fullFilename)
 
 	// Extract the extension
 	ext := filepath.Ext(normalized)
@@ -131,9 +135,88 @@ func ResolveContentTypeExtension(contentType string) string {
 	}
 }
 
-func normalizeFilename(filename string) string {
+func normalizeString(filename string) string {
 	filename = strings.TrimSpace(filename)
 	filename = strings.ToLower(filename)
 	filename = strings.ReplaceAll(filename, " ", "-")
 	return filename
+}
+
+// ComputeFileHash calculates the SHA-256 hash of a file
+func ComputeFileHash(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", fmt.Errorf("failed to compute hash: %w", err)
+	}
+
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+// supportedVideoExtensionsList is the single source of truth for supported video extensions
+var supportedVideoExtensionsList = []string{"mp4", "mov", "avi", "mkv", "webm", "flv", "wmv", "m4v", "mpg", "mpeg"}
+
+// supportedVideoExtensionsMap is used for efficient lookup
+var supportedVideoExtensionsMap = func() map[string]bool {
+	m := make(map[string]bool, len(supportedVideoExtensionsList))
+	for _, ext := range supportedVideoExtensionsList {
+		m[ext] = true
+	}
+	return m
+}()
+
+// supportedImageExtensionsList is the single source of truth for supported image extensions
+var supportedImageExtensionsList = []string{"jpg", "jpeg", "png", "gif", "webp", "heic", "heif"}
+
+// supportedImageExtensionsMap is used for efficient lookup
+var supportedImageExtensionsMap = func() map[string]bool {
+	m := make(map[string]bool, len(supportedImageExtensionsList))
+	for _, ext := range supportedImageExtensionsList {
+		m[ext] = true
+	}
+	return m
+}()
+
+// IsVideoFile checks if a file extension corresponds to a supported video format
+func IsVideoFile(filename string) bool {
+	_, ext := ExtractFileName(filename)
+	return IsVideoExtension(ext)
+}
+
+// IsVideoExtension checks if an extension corresponds to a supported video format
+func IsVideoExtension(ext string) bool {
+	ext = strings.ToLower(strings.TrimPrefix(ext, "."))
+	return supportedVideoExtensionsMap[ext]
+}
+
+// GetSupportedVideoExtensions returns a list of supported video file extensions
+func GetSupportedVideoExtensions() []string {
+	return supportedVideoExtensionsList
+}
+
+// IsImageFile checks if a file extension corresponds to a supported image format
+func IsImageFile(filename string) bool {
+	_, ext := ExtractFileName(filename)
+	return IsImageExtension(ext)
+}
+
+// IsImageExtension checks if an extension corresponds to a supported image format
+func IsImageExtension(ext string) bool {
+	ext = strings.ToLower(strings.TrimPrefix(ext, "."))
+	return supportedImageExtensionsMap[ext]
+}
+
+// GetSupportedImageExtensions returns a list of supported image file extensions
+func GetSupportedImageExtensions() []string {
+	return supportedImageExtensionsList
+}
+
+// IsVideoOrImageFile checks if a file is either a video or image
+func IsVideoOrImageFile(filename string) bool {
+	return IsVideoFile(filename) || IsImageFile(filename)
 }

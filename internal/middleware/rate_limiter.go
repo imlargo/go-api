@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/internal/responses"
-	"github.com/imlargo/go-api/pkg/ratelimiter"
+	"github.com/nicolailuther/butter/internal/responses"
+	"github.com/nicolailuther/butter/pkg/ratelimiter"
 )
 
 func NewRateLimiterMiddleware(rl ratelimiter.RateLimiter) gin.HandlerFunc {
@@ -14,7 +14,7 @@ func NewRateLimiterMiddleware(rl ratelimiter.RateLimiter) gin.HandlerFunc {
 		allow, retryAfter := rl.Allow(ip)
 		if !allow {
 			message := "Rate limit exceeded. Try again in " + fmt.Sprintf("%.2f", retryAfter)
-			responses.ErrorToManyRequests(ctx, message)
+			responses.ErrorTooManyRequests(ctx, message)
 			ctx.Abort()
 			return
 		}

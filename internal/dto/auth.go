@@ -1,19 +1,25 @@
 package dto
 
-import "github.com/imlargo/go-api/internal/models"
+import "github.com/nicolailuther/butter/internal/models"
 
-type LoginUser struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type AuthTokens struct {
+type AuthTokensResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ExpiresAt    int64  `json:"expires_at"`
 }
 
-type UserAuthResponse struct {
-	User   models.User `json:"user"`
-	Tokens AuthTokens  `json:"tokens"`
+type AuthResponse struct {
+	User   models.User        `json:"user"`
+	Tokens AuthTokensResponse `json:"tokens"`
+}
+
+type LoginUserRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type ChangePasswordRequest struct {
+	OldPassword        string `json:"old_password" binding:"required"`
+	NewPassword        string `json:"new_password" binding:"required"`
+	NewPasswordConfirm string `json:"new_password_confirm" binding:"required"`
 }

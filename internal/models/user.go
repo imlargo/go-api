@@ -1,64 +1,43 @@
 package models
 
 import (
-	"errors"
 	"time"
+
+	"github.com/nicolailuther/butter/internal/enums"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Name     string `json:"name" gorm:"not null"`
-	Email    string `json:"email" gorm:"unique;not null"`
-	Password string `json:"-" gorm:"not null"`
-}
+	Name            string          `json:"name" gorm:"not null"`
+	Email           string          `json:"email" gorm:"unique;not null"`
+	Password        string          `json:"password" gorm:"not null"`
+	Role            enums.UserRole  `json:"role"`
+	ChangedPassword bool            `json:"changed_password"`
+	TierLevel       enums.TierLevel `json:"tier_level"` // User's subscription tier level
 
-func (user *User) ValidateUserCreation() error {
-	if user.Name == "" {
-		return errors.New("Name is required")
-	}
+	// Stripe-related fields for subscription management
+	StripeCustomerID   string    `json:"stripe_customer_id" gorm:"default:null"`
+	SubscriptionStatus string    `json:"subscription_status"`
+	CurrentPeriodEnd   time.Time `json:"current_period_end"`
 
-	if user.Email == "" {
-		return errors.New("Email is required")
-	}
+	// Onboarding preferences
+	Type     enums.UserType `json:"type" gorm:"type:varchar(50)"`
+	Industry enums.Industry `json:"industry" gorm:"type:varchar(50)"`
+	Goal     enums.Goal     `json:"goal" gorm:"type:varchar(50)"`
+	TeamSize enums.TeamSize `json:"team_size" gorm:"type:varchar(50)"`
 
-	if user.Password == "" {
-		return errors.New("Password is required")
-	}
+	CreatedBy      uint `json:"created_by" gorm:"index;default:null" `
+	ReferralCodeID uint `json:"referral_code_id" gorm:"default:null"`
 
-	return nil
-}
+	Creator *User `json:"creator" gorm:"foreignKey:CreatedBy;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" swaggerignore:"true"`
 
-func (user *User) ValidatePassword() error {
-	if user.Password == "" {
-		return errors.New("Password is required")
-	}
+	AssignedClients []*Client  `gorm:"many2many:user_clients" json:"assigned_clients"`
+	Accounts        []*Account `gorm:"many2many:user_accounts;" json:"assigned_accounts"`
 
-	if len(user.Password) < 8 {
-		return errors.New("Password must be at least 8 characters long")
-	}
-
-	if len(user.Password) > 30 {
-		return errors.New("Password must be less than 100 characters long")
-	}
-
-	if user.Password == user.Email {
-		return errors.New("Password cannot be the same as email")
-	}
-
-	if user.Password == user.Name {
-		return errors.New("Password cannot be the same as name")
-	}
-
-	// Check insecure passwords
-	insecurePasswords := []string{"12345678", "password", "admin123"}
-	for _, insecurePassword := range insecurePasswords {
-		if user.Password == insecurePassword {
-			return errors.New("Password is too weak")
-		}
-	}
-
-	return nil
+	ReferralCode *ReferralCode `gorm:"foreignKey:ReferralCodeID" json:"-"`
 }

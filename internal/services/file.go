@@ -10,54 +10,57 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/imlargo/go-api/internal/dto"
-	"github.com/imlargo/go-api/internal/models"
-	"github.com/imlargo/go-api/pkg/storage"
-	"github.com/imlargo/go-api/pkg/utils"
+	"github.com/nicolailuther/butter/internal/dto"
+	"github.com/nicolailuther/butter/internal/models"
+	"github.com/nicolailuther/butter/pkg/storage"
+	"github.com/nicolailuther/butter/pkg/utils"
 )
 
 type FileService interface {
-	UploadFromMultipart(file *multipart.FileHeader) (*models.File, error)
-	UploadFromReader(file *storage.File) (*models.File, error)
-	UploadFromUrl(url string) (*models.File, error)
+	UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error)
+	UploadFileFromReader(file *storage.File) (*models.File, error)
+	UploadFileFromUrl(url string) (*models.File, error)
 	GetFile(id uint) (*models.File, error)
 	DeleteFile(id uint) error
-	GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURL, error)
+	GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURLResponse, error)
 	BulkDeleteFiles(fileIDs []uint) error
 	DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error)
 }
 
-type fileService struct {
+type fileServiceImpl struct {
 	*Service
 	storageService     storage.FileStorage
+	defaultBucket      string
 	maxFileSize        int64
 	urlDownloadTimeout time.Duration
 }
 
 func NewFileService(
-	service *Service,
+	container *Service,
 	storageService storage.FileStorage,
+	defaultBucket string,
 ) FileService {
-	return &fileService{
-		Service:            service,
+	return &fileServiceImpl{
+		Service:            container,
 		storageService:     storageService,
+		defaultBucket:      defaultBucket,
 		maxFileSize:        1 * 1024 * 1024 * 1024, // 1GB
 		urlDownloadTimeout: 60 * time.Second * 15,  // Timeout for URL downloads
 	}
 }
 
-func (s *fileService) UploadFromUrl(url string) (*models.File, error) {
-	file, err := s.createFileFromUrl(url)
+func (u *fileServiceImpl) UploadFileFromUrl(url string) (*models.File, error) {
+	file, err := u.createFileFromUrl(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create file from URL: %w", err)
 	}
 
-	return s.UploadFromReader(file)
+	return u.UploadFileFromReader(file)
 }
 
-func (s *fileService) UploadFromReader(file *storage.File) (*models.File, error) {
+func (u *fileServiceImpl) UploadFileFromReader(file *storage.File) (*models.File, error) {
 
-	if file.Size > s.maxFileSize {
+	if file.Size > u.maxFileSize {
 		return nil, fmt.Errorf("file size exceeds limit of 1GB")
 	}
 
@@ -65,14 +68,14 @@ func (s *fileService) UploadFromReader(file *storage.File) (*models.File, error)
 
 	_, ext := utils.ExtractFileName(file.Filename)
 
-	key := s.createFileKey(fileID, ext)
+	key := u.createFileKey(fileID, ext)
 
 	contentType := file.ContentType
 	if contentType == "" {
 		contentType = utils.DetectContentType(ext)
 	}
 
-	uploadResult, err := s.storageService.Upload(
+	upload, err := u.storageService.Upload(
 		key,
 		file.Reader,
 		contentType,
@@ -82,23 +85,23 @@ func (s *fileService) UploadFromReader(file *storage.File) (*models.File, error)
 		return nil, fmt.Errorf("failed to upload file to R2: %w", err)
 	}
 
-	createdFile := &models.File{
-		ContentType: uploadResult.ContentType,
-		Size:        uploadResult.Size,
-		Etag:        uploadResult.Etag,
-		Path:        uploadResult.Key,
-		Url:         uploadResult.Url,
+	created := &models.File{
+		ContentType: upload.ContentType,
+		Size:        upload.Size,
+		Etag:        upload.Etag,
+		Path:        upload.Key,
+		Url:         upload.Url,
 	}
-	if err := s.store.Files.Create(createdFile); err != nil {
-		s.storageService.Delete(key)
+	if err := u.store.Files.Create(created); err != nil {
+		u.storageService.Delete(key)
 		return nil, fmt.Errorf("failed to save file record: %w", err)
 	}
 
-	return createdFile, nil
+	return created, nil
 }
 
-func (s *fileService) UploadFromMultipart(file *multipart.FileHeader) (*models.File, error) {
-	if file.Size > s.maxFileSize {
+func (u *fileServiceImpl) UploadFileFromMultipart(file *multipart.FileHeader) (*models.File, error) {
+	if file.Size > u.maxFileSize {
 		return nil, fmt.Errorf("file size exceeds limit of 1GB")
 	}
 
@@ -113,14 +116,14 @@ func (s *fileService) UploadFromMultipart(file *multipart.FileHeader) (*models.F
 
 	_, ext := utils.ExtractFileName(file.Filename)
 
-	key := s.createFileKey(fileID, ext)
+	key := u.createFileKey(fileID, ext)
 
 	contentType := file.Header.Get("Content-Type")
 	if contentType == "" {
 		contentType = utils.DetectContentType(ext)
 	}
 
-	uploadResult, err := s.storageService.Upload(
+	upload, err := u.storageService.Upload(
 		key,
 		src,
 		contentType,
@@ -131,23 +134,23 @@ func (s *fileService) UploadFromMultipart(file *multipart.FileHeader) (*models.F
 		return nil, fmt.Errorf("failed to upload file to R2: %w", err)
 	}
 
-	createdFile := &models.File{
-		ContentType: uploadResult.ContentType,
-		Size:        uploadResult.Size,
-		Etag:        uploadResult.Etag,
-		Path:        uploadResult.Key,
-		Url:         uploadResult.Url,
+	created := &models.File{
+		ContentType: upload.ContentType,
+		Size:        upload.Size,
+		Etag:        upload.Etag,
+		Path:        upload.Key,
+		Url:         upload.Url,
 	}
-	if err := s.store.Files.Create(createdFile); err != nil {
-		s.storageService.Delete(key)
+	if err := u.store.Files.Create(created); err != nil {
+		u.storageService.Delete(key)
 		return nil, fmt.Errorf("failed to save file record: %w", err)
 	}
 
-	return createdFile, nil
+	return created, nil
 }
 
-func (s *fileService) GetFile(id uint) (*models.File, error) {
-	file, err := s.store.Files.GetByID(id)
+func (u *fileServiceImpl) GetFile(id uint) (*models.File, error) {
+	file, err := u.store.Files.GetByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("file not found: %w", err)
 	}
@@ -155,26 +158,34 @@ func (s *fileService) GetFile(id uint) (*models.File, error) {
 	return file, nil
 }
 
-func (s *fileService) DeleteFile(id uint) error {
-	file, err := s.store.Files.GetByID(id)
+func (u *fileServiceImpl) DeleteFile(id uint) error {
+	if id == 0 {
+		return fmt.Errorf("file ID cannot be zero")
+	}
+
+	file, err := u.store.Files.GetByID(id)
 	if err != nil {
 		return fmt.Errorf("file not found: %w", err)
 	}
 
-	if err := s.storageService.Delete(file.Path); err != nil {
-		return fmt.Errorf("failed to delete from storage: %w", err)
+	// Delete from storage first
+	if file.Path != "" {
+		if err := u.storageService.Delete(file.Path); err != nil {
+			u.logger.Errorf("Failed to delete file from storage (path: %s): %v", file.Path, err)
+			// Continue with database deletion - storage cleanup can be handled separately
+		}
 	}
 
-	// Eliminar de BD
-	if err := s.store.Files.Delete(id); err != nil {
+	// Delete from database
+	if err := u.store.Files.Delete(id); err != nil {
 		return fmt.Errorf("failed to delete file record: %w", err)
 	}
 
 	return nil
 }
 
-func (s *fileService) GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURL, error) {
-	file, err := s.store.Files.GetByID(fileID)
+func (u *fileServiceImpl) GetPresignedURL(fileID uint, expiryMins int) (*dto.PresignedURLResponse, error) {
+	file, err := u.store.Files.GetByID(fileID)
 	if err != nil {
 		return nil, fmt.Errorf("file not found: %w", err)
 	}
@@ -184,18 +195,18 @@ func (s *fileService) GetPresignedURL(fileID uint, expiryMins int) (*dto.Presign
 		expiry = 15 * time.Minute // default 15 minutes
 	}
 
-	url, err := s.storageService.GetPresignedURL(file.Path, expiry)
+	url, err := u.storageService.GetPresignedURL(file.Path, expiry)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate presigned URL: %w", err)
 	}
 
-	return &dto.PresignedURL{
+	return &dto.PresignedURLResponse{
 		Url:       url,
 		ExpiresAt: time.Now().Add(expiry).Format(time.RFC3339),
 	}, nil
 }
 
-func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
+func (u *fileServiceImpl) createFileFromUrl(urlStr string) (*storage.File, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid URL: %w", err)
@@ -206,7 +217,7 @@ func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
 	}
 
 	client := &http.Client{
-		Timeout: s.urlDownloadTimeout,
+		Timeout: u.urlDownloadTimeout,
 	}
 
 	req, err := http.NewRequest("GET", urlStr, nil)
@@ -227,12 +238,12 @@ func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
 	}
 
 	// Check Content-Length before reading to prevent downloading huge files
-	if resp.ContentLength > 0 && resp.ContentLength > s.maxFileSize {
-		return nil, fmt.Errorf("file size %d exceeds limit of %d bytes", resp.ContentLength, s.maxFileSize)
+	if resp.ContentLength > 0 && resp.ContentLength > u.maxFileSize {
+		return nil, fmt.Errorf("file size %d exceeds limit of %d bytes", resp.ContentLength, u.maxFileSize)
 	}
 
 	// Use LimitReader to prevent memory exhaustion even if Content-Length is not set
-	limitedReader := io.LimitReader(resp.Body, s.maxFileSize+1) // +1 to detect if limit exceeded
+	limitedReader := io.LimitReader(resp.Body, u.maxFileSize+1) // +1 to detect if limit exceeded
 
 	data, err := io.ReadAll(limitedReader)
 	if err != nil {
@@ -240,8 +251,8 @@ func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
 	}
 
 	// Check if we hit the limit (meaning file is too large)
-	if int64(len(data)) > s.maxFileSize {
-		return nil, fmt.Errorf("file size exceeds limit of %d bytes", s.maxFileSize)
+	if int64(len(data)) > u.maxFileSize {
+		return nil, fmt.Errorf("file size exceeds limit of %d bytes", u.maxFileSize)
 	}
 
 	contentType := resp.Header.Get("Content-Type")
@@ -249,7 +260,7 @@ func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
 		contentType = "application/octet-stream"
 	}
 
-	filename := s.extractUrlFilename(urlStr, resp.Header.Get("Content-Disposition"), contentType)
+	filename := u.extractUrlFilename(urlStr, resp.Header.Get("Content-Disposition"), contentType)
 
 	return &storage.File{
 		Reader:      bytes.NewReader(data),
@@ -259,31 +270,47 @@ func (s *fileService) createFileFromUrl(urlStr string) (*storage.File, error) {
 	}, nil
 }
 
-func (s *fileService) BulkDeleteFiles(fileIDs []uint) error {
+func (u *fileServiceImpl) BulkDeleteFiles(fileIDs []uint) error {
 	if len(fileIDs) == 0 {
 		return nil // No files to delete
 	}
 
-	fileKeys, err := s.store.Files.GetFilesKeys(fileIDs)
+	// Filter out any zero IDs
+	validFileIDs := make([]uint, 0, len(fileIDs))
+	for _, id := range fileIDs {
+		if id > 0 {
+			validFileIDs = append(validFileIDs, id)
+		}
+	}
+
+	if len(validFileIDs) == 0 {
+		return nil // No valid files to delete
+	}
+
+	fileKeys, err := u.store.Files.GetFilesKeys(validFileIDs)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve files: %w", err)
+		return fmt.Errorf("failed to retrieve file keys: %w", err)
 	}
 
-	if err := s.storageService.BulkDelete(fileKeys); err != nil {
-		s.logger.Errorln("Error deleting multiple files from storage:", err.Error())
-		return err
+	// Only proceed with storage deletion if we have file keys
+	if len(fileKeys) > 0 {
+		if err := u.storageService.BulkDelete(fileKeys); err != nil {
+			u.logger.Errorf("Error deleting files from storage: %v", err)
+			// Continue with database deletion even if storage deletion fails
+		}
 	}
 
-	if err := s.store.Files.DeleteFiles(fileIDs); err != nil {
+	// Delete file records from database
+	if err := u.store.Files.DeleteFiles(validFileIDs); err != nil {
 		return fmt.Errorf("failed to delete file records: %w", err)
 	}
 
 	return nil
 }
 
-func (s *fileService) DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error) {
+func (u *fileServiceImpl) DownloadFile(fileID uint) (*models.File, *storage.FileDownload, error) {
 
-	file, err := s.store.Files.GetByID(fileID)
+	file, err := u.store.Files.GetByID(fileID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("file not found: %w", err)
 	}
@@ -292,7 +319,7 @@ func (s *fileService) DownloadFile(fileID uint) (*models.File, *storage.FileDown
 		return nil, nil, fmt.Errorf("file path is empty, cannot download")
 	}
 
-	downloadData, err := s.storageService.GetFileForDownload(file.Path)
+	downloadData, err := u.storageService.GetFileForDownload(file.Path)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to download file: %w", err)
 	}
@@ -300,13 +327,13 @@ func (s *fileService) DownloadFile(fileID uint) (*models.File, *storage.FileDown
 	return file, downloadData, nil
 }
 
-func (s *fileService) createFileKey(fileID uuid.UUID, ext string) string {
+func (u *fileServiceImpl) createFileKey(fileID uuid.UUID, ext string) string {
 	now := time.Now()
 	datePrefix := now.Format("2006/01/02")
 	return fmt.Sprintf("%s/%s.%s", datePrefix, fileID.String(), ext)
 }
 
-func (s *fileService) extractUrlFilename(urlStr, disposition, contentType string) string {
+func (u *fileServiceImpl) extractUrlFilename(urlStr, disposition, contentType string) string {
 	// Try URL first
 	filename, ext, err := utils.ExtractFileNameFromURL(urlStr)
 	if err == nil && filename != "" {

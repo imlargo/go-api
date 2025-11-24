@@ -3,5 +3,7 @@ package enums
 type NotificationType string
 
 const (
-	NotificationTypeBase NotificationType = "base"
+	NotificationTypeOnlyFans    NotificationType = "onlyfans"
+	NotificationTypeMarketplace NotificationType = "marketplace"
+	NotificationTypeReferral    NotificationType = "referral"
 )

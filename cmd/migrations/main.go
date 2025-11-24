@@ -3,19 +3,19 @@ package main
 import (
 	"log"
 
-	"github.com/imlargo/go-api/internal/config"
-	postgres "github.com/imlargo/go-api/internal/database"
+	"github.com/nicolailuther/butter/internal/config"
+	"github.com/nicolailuther/butter/internal/database"
 )
 
 func main() {
 	cfg := config.LoadConfig()
 
-	db, err := postgres.NewPostgres(cfg.Database.URL)
+	db, err := database.NewPostgres(cfg.Database.URL)
 	if err != nil {
-		log.Fatal("Could not initialize database: ", err)
+		log.Fatal("Error: Could not initialize database: ", err)
 	}
 
-	err = postgres.Migrate(db)
+	err = database.Migrate(db)
 	if err != nil {
 		log.Fatal("Could not run migrations: ", err)
 		return

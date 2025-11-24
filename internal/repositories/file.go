@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/imlargo/go-api/internal/models"
+	"github.com/nicolailuther/butter/internal/models"
 	"gorm.io/gorm/clause"
 )
 
@@ -20,7 +20,9 @@ type fileRepository struct {
 	*Repository
 }
 
-func NewFileRepository(r *Repository) FileRepository {
+func NewFileRepository(
+	r *Repository,
+) FileRepository {
 	return &fileRepository{
 		Repository: r,
 	}

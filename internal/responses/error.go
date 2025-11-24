@@ -32,7 +32,7 @@ func ErrorBadRequest(c *gin.Context, message string) {
 	NewErrorResponse(c, http.StatusBadRequest, message, errBadRequest)
 }
 
-func ErrorToManyRequests(c *gin.Context, message string) {
+func ErrorTooManyRequests(c *gin.Context, message string) {
 	NewErrorResponse(c, http.StatusTooManyRequests, message, errToManyRequests)
 }
 

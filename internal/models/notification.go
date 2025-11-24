@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/imlargo/go-api/internal/enums"
+	"github.com/nicolailuther/butter/internal/enums"
 )
 
 type Notification struct {

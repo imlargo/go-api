@@ -1,7 +1,7 @@
-package postgres
+package database
 
 import (
-	"github.com/imlargo/go-api/internal/models"
+	"github.com/nicolailuther/butter/internal/models"
 	"gorm.io/gorm"
 )
 

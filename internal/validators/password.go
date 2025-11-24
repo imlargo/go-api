@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
+// ValidatePassword validates a password string against security requirements
 func ValidatePassword(password string) error {
-
 	cleanedPassword := strings.TrimSpace(password)
 
 	if cleanedPassword == "" {
@@ -22,11 +22,30 @@ func ValidatePassword(password string) error {
 	}
 
 	// Check insecure passwords
-	insecurePasswords := []string{"12345678", "password"}
+	insecurePasswords := []string{"12345678", "password", "admin123"}
 	for _, insecurePassword := range insecurePasswords {
 		if cleanedPassword == insecurePassword {
 			return errors.New("password is too weak")
 		}
+	}
+
+	return nil
+}
+
+// ValidatePasswordWithContext validates a password with additional context (email, name)
+func ValidatePasswordWithContext(password, email, name string) error {
+	if err := ValidatePassword(password); err != nil {
+		return err
+	}
+
+	cleanedPassword := strings.TrimSpace(password)
+
+	if cleanedPassword == email {
+		return errors.New("password cannot be the same as email")
+	}
+
+	if cleanedPassword == name {
+		return errors.New("password cannot be the same as name")
 	}
 
 	return nil

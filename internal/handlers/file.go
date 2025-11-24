@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/internal/dto"
-	_ "github.com/imlargo/go-api/internal/models"
-	"github.com/imlargo/go-api/internal/responses"
-	"github.com/imlargo/go-api/internal/services"
+	"github.com/nicolailuther/butter/internal/dto"
+	_ "github.com/nicolailuther/butter/internal/models"
+	"github.com/nicolailuther/butter/internal/responses"
+	"github.com/nicolailuther/butter/internal/services"
 )
 
 type FileHandler struct {
@@ -42,7 +42,7 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 		responses.ErrorBadRequest(c, "Invalid file: "+err.Error())
 	}
 
-	result, err := h.fileService.UploadFromMultipart(file)
+	result, err := h.fileService.UploadFileFromMultipart(file)
 	if err != nil {
 		responses.ErrorInternalServerWithMessage(c, "Failed to upload file: "+err.Error())
 		return
@@ -113,7 +113,7 @@ func (h *FileHandler) DeleteFile(c *gin.Context) {
 // @Param			fileID	path	int				true	"File ID"
 // @Accept			json
 // @Produce		json
-// @Param		payload	body	dto.CreatePresignedUrl				true	"Expiry time in minutes for the presigned URL"
+// @Param		payload	body	dto.GetPresignedURLRequest				true	"Expiry time in minutes for the presigned URL"
 // @Failure		400	{object}	responses.ErrorResponse	"Bad Request"
 // @Failure		500	{object}	responses.ErrorResponse	"Internal Server Error"
 // @Security     BearerAuth
@@ -126,7 +126,7 @@ func (h *FileHandler) GetPresignedURL(c *gin.Context) {
 	}
 
 	// Bind the request payload
-	var payload dto.CreatePresignedUrl
+	var payload dto.GetPresignedURLRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		responses.ErrorBadRequest(c, "Invalid request data: "+err.Error())
 		return
