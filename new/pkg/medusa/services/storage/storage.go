@@ -35,8 +35,9 @@ func NewFileStorage(provider StorageProvider, config StorageConfig) (FileStorage
 	}
 
 	return &fileStorage{
-		client: client,
-		config: config,
+		client:   client,
+		config:   config,
+		provider: provider,
 	}, nil
 }
 
