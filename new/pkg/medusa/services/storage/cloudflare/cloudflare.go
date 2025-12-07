@@ -1,4 +1,4 @@
-package storage
+package cloudflare
 
 import (
 	"context"
@@ -8,40 +8,17 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/imlargo/go-api/pkg/medusa/services/storage"
 )
 
 type r2Storage struct {
 	client *s3.Client
-	config StorageConfig
+	config storage.StorageConfig
 }
 
-func newR2Client(r2Config StorageConfig) (*s3.Client, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2Config.AccessKeyID, r2Config.SecretAccessKey, "")),
-		config.WithRegion("auto"),
-		// Cloudflare R2 does not support AWS S3 checksum calculation or validation features.
-		// These settings are disabled to ensure compatibility and prevent errors when interacting with R2.
-		config.WithRequestChecksumCalculation(aws.RequestChecksumCalculationUnset),
-		config.WithResponseChecksumValidation(aws.ResponseChecksumValidationUnset),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("error loading AWS config: %w", err)
-	}
-
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(fmt.Sprintf("https://%s.r2.cloudflarestorage.com", r2Config.AccountID))
-		o.UsePathStyle = true
-	})
-
-	return client, nil
-}
-
-func NewR2Storage(config StorageConfig) (FileStorage, error) {
+func NewR2Storage(config storage.StorageConfig) (storage.FileStorage, error) {
 	client, err := newR2Client(config)
 	if err != nil {
 		return nil, err
@@ -53,7 +30,7 @@ func NewR2Storage(config StorageConfig) (FileStorage, error) {
 	}, nil
 }
 
-func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*FileResult, error) {
+func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*storage.FileResult, error) {
 	ctx := context.Background()
 
 	// Prepare the put object input
@@ -72,7 +49,7 @@ func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, siz
 	}
 
 	// Create the file model
-	file := &FileResult{
+	file := &storage.FileResult{
 		Key:         key,
 		Size:        size,
 		ContentType: contentType,
@@ -161,8 +138,8 @@ func (s *r2Storage) BulkDelete(keys []string) error {
 	var allErrors []string
 
 	// Process files in batches
-	for i := 0; i < len(keys); i += MaxBatchSize {
-		end := i + MaxBatchSize
+	for i := 0; i < len(keys); i += storage.MaxBatchSize {
+		end := i + storage.MaxBatchSize
 		if end > len(keys) {
 			end = len(keys)
 		}
@@ -224,7 +201,7 @@ func clearStringQuotes(s string) string {
 	return quotesRegex.ReplaceAllString(s, "")
 }
 
-func (s *r2Storage) GetFileForDownload(key string) (*FileDownload, error) {
+func (s *r2Storage) GetFileForDownload(key string) (*storage.FileDownload, error) {
 	ctx := context.Background()
 
 	input := &s3.GetObjectInput{
@@ -249,7 +226,7 @@ func (s *r2Storage) GetFileForDownload(key string) (*FileDownload, error) {
 		size = *result.ContentLength
 	}
 
-	return &FileDownload{
+	return &storage.FileDownload{
 		Content:     result.Body,
 		ContentType: contentType,
 		Size:        size,
