@@ -1,40 +1,23 @@
 package email
 
 import (
+	"github.com/imlargo/go-api/pkg/medusa/services/email"
 	"github.com/resend/resend-go/v2"
 )
 
-type EmailClient interface {
-	SendEmail(params *SendEmailParams) (*SendEmailResponse, error)
-}
-
-type SendEmailParams struct {
-	From    string
-	To      []string
-	Subject string
-	Html    string
-	Text    string
-	Cc      []string
-	Bcc     []string
-	ReplyTo string
-}
-
-type SendEmailResponse struct {
-	ID string
-}
-
-type emailClient struct {
+type resendEmailClient struct {
 	client *resend.Client
 }
 
-func NewEmailClient(apiKey string) EmailClient {
+func NewResendEmailClient(apiKey string) email.EmailService {
 	client := resend.NewClient(apiKey)
-	return &emailClient{
+	return &resendEmailClient{
 		client: client,
 	}
 }
 
-func (e *emailClient) SendEmail(params *SendEmailParams) (*SendEmailResponse, error) {
+func (e *resendEmailClient) SendEmail(params *email.SendEmailParams) (*email.SendEmailResponse, error) {
+
 	sendParams := &resend.SendEmailRequest{
 		From:    params.From,
 		To:      params.To,
@@ -60,7 +43,7 @@ func (e *emailClient) SendEmail(params *SendEmailParams) (*SendEmailResponse, er
 		return nil, err
 	}
 
-	return &SendEmailResponse{
+	return &email.SendEmailResponse{
 		ID: sent.Id,
 	}, nil
 }
