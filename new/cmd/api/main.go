@@ -13,13 +13,20 @@ func main() {
 
 	logger := logger.NewLogger()
 
-	engine := gin.Default()
+	router := gin.Default()
 	srv := http.NewServer(
-		engine,
+		router,
 		logger,
 		http.WithServerHost("localhost"),
 		http.WithServerPort(8080),
 	)
+
+	// MOUNT APP
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 
 	app := app.NewApp(
 		app.WithName("butter"),
