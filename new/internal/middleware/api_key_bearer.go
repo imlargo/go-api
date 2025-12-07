@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/pkg/medusa/responses"
+	"github.com/imlargo/go-api/pkg/medusa/core/responses"
 )
 
 func BearerApiKeyMiddleware(apiKey string) gin.HandlerFunc {
