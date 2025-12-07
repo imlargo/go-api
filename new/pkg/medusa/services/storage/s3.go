@@ -1,4 +1,4 @@
-package cloudflare
+package storage
 
 import (
 	"context"
@@ -10,27 +10,27 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/imlargo/go-api/pkg/medusa/services/storage"
 )
 
-type r2Storage struct {
-	client *s3.Client
-	config storage.StorageConfig
+type s3Storage struct {
+	client   *s3.Client
+	config   StorageConfig
+	provider StorageProvider
 }
 
-func NewR2Storage(config storage.StorageConfig) (storage.FileStorage, error) {
-	client, err := newR2Client(config)
+func NewR2Storage(provider StorageProvider, config StorageConfig) (FileStorage, error) {
+	client, err := GetStorageClient(provider, config)
 	if err != nil {
 		return nil, err
 	}
 
-	return &r2Storage{
+	return &s3Storage{
 		client: client,
 		config: config,
 	}, nil
 }
 
-func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*storage.FileResult, error) {
+func (s *s3Storage) Upload(key string, reader io.Reader, contentType string, size int64) (*FileResult, error) {
 	ctx := context.Background()
 
 	// Prepare the put object input
@@ -49,7 +49,7 @@ func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, siz
 	}
 
 	// Create the file model
-	file := &storage.FileResult{
+	file := &FileResult{
 		Key:         key,
 		Size:        size,
 		ContentType: contentType,
@@ -64,7 +64,7 @@ func (s *r2Storage) Upload(key string, reader io.Reader, contentType string, siz
 	return file, nil
 }
 
-func (s *r2Storage) Download(key string) (io.ReadCloser, error) {
+func (s *s3Storage) Download(key string) (io.ReadCloser, error) {
 	ctx := context.Background()
 
 	input := &s3.GetObjectInput{
@@ -80,7 +80,7 @@ func (s *r2Storage) Download(key string) (io.ReadCloser, error) {
 	return result.Body, nil
 }
 
-func (s *r2Storage) Delete(key string) error {
+func (s *s3Storage) Delete(key string) error {
 	ctx := context.Background()
 
 	input := &s3.DeleteObjectInput{
@@ -96,7 +96,7 @@ func (s *r2Storage) Delete(key string) error {
 	return nil
 }
 
-func (s *r2Storage) GetPresignedURL(key string, expiry time.Duration) (string, error) {
+func (s *s3Storage) GetPresignedURL(key string, expiry time.Duration) (string, error) {
 	ctx := context.Background()
 
 	// Create a presign client
@@ -119,7 +119,7 @@ func (s *r2Storage) GetPresignedURL(key string, expiry time.Duration) (string, e
 	return result.URL, nil
 }
 
-func (s *r2Storage) GetPublicURL(key string) string {
+func (s *s3Storage) GetPublicURL(key string) string {
 	if s.config.PublicDomain != "" {
 		return fmt.Sprintf("https://%s/%s", s.config.PublicDomain, key)
 	}
@@ -128,7 +128,7 @@ func (s *r2Storage) GetPublicURL(key string) string {
 	return fmt.Sprintf("https://pub-%s.r2.dev/%s", s.config.AccountID, key)
 }
 
-func (s *r2Storage) BulkDelete(keys []string) error {
+func (s *s3Storage) BulkDelete(keys []string) error {
 	if len(keys) == 0 {
 		return nil
 	}
@@ -138,8 +138,8 @@ func (s *r2Storage) BulkDelete(keys []string) error {
 	var allErrors []string
 
 	// Process files in batches
-	for i := 0; i < len(keys); i += storage.MaxBatchSize {
-		end := i + storage.MaxBatchSize
+	for i := 0; i < len(keys); i += MaxBatchSize {
+		end := i + MaxBatchSize
 		if end > len(keys) {
 			end = len(keys)
 		}
@@ -159,7 +159,7 @@ func (s *r2Storage) BulkDelete(keys []string) error {
 }
 
 // deleteBatch deletes a single batch of files (up to 1000 objects)
-func (s *r2Storage) deleteBatch(ctx context.Context, keys []string) error {
+func (s *s3Storage) deleteBatch(ctx context.Context, keys []string) error {
 	// Convert keys to ObjectIdentifier slice
 	objects := make([]types.ObjectIdentifier, len(keys))
 	for i, key := range keys {
@@ -201,7 +201,7 @@ func clearStringQuotes(s string) string {
 	return quotesRegex.ReplaceAllString(s, "")
 }
 
-func (s *r2Storage) GetFileForDownload(key string) (*storage.FileDownload, error) {
+func (s *s3Storage) GetFileForDownload(key string) (*FileDownload, error) {
 	ctx := context.Background()
 
 	input := &s3.GetObjectInput{
@@ -226,7 +226,7 @@ func (s *r2Storage) GetFileForDownload(key string) (*storage.FileDownload, error
 		size = *result.ContentLength
 	}
 
-	return &storage.FileDownload{
+	return &FileDownload{
 		Content:     result.Body,
 		ContentType: contentType,
 		Size:        size,
