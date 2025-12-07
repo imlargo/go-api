@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
+// FileStorage defines the interface for file storage operations
 type FileStorage interface {
 	Upload(key string, reader io.Reader, contentType string, size int64) (*FileResult, error)
 	Download(key string) (io.ReadCloser, error)
@@ -28,10 +29,17 @@ type fileStorage struct {
 	provider StorageProvider
 }
 
+var quotesRegex = regexp.MustCompile(`"`)
+
+// NewFileStorage creates a new file storage instance with the specified provider
 func NewFileStorage(provider StorageProvider, config StorageConfig) (FileStorage, error) {
+	if !provider.IsValid() {
+		return nil, fmt.Errorf("unsupported storage provider: %s", provider)
+	}
+
 	client, err := NewStorageClient(provider, config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create storage client: %w", err)
 	}
 
 	return &fileStorage{
@@ -41,10 +49,10 @@ func NewFileStorage(provider StorageProvider, config StorageConfig) (FileStorage
 	}, nil
 }
 
+// Upload uploads a file to the storage
 func (s *fileStorage) Upload(key string, reader io.Reader, contentType string, size int64) (*FileResult, error) {
 	ctx := context.Background()
 
-	// Prepare the put object input
 	input := &s3.PutObjectInput{
 		Bucket:        aws.String(s.config.BucketName),
 		Key:           aws.String(key),
@@ -53,13 +61,11 @@ func (s *fileStorage) Upload(key string, reader io.Reader, contentType string, s
 		ContentLength: aws.Int64(size),
 	}
 
-	// Upload the file
 	result, err := s.client.PutObject(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to upload file to R2: %w", err)
+		return nil, fmt.Errorf("failed to upload file: %w", err)
 	}
 
-	// Create the file model
 	file := &FileResult{
 		Key:         key,
 		Size:        size,
@@ -67,7 +73,6 @@ func (s *fileStorage) Upload(key string, reader io.Reader, contentType string, s
 		Etag:        clearStringQuotes(aws.ToString(result.ETag)),
 	}
 
-	// Set the URL based on configuration
 	if s.config.UsePublicURL {
 		file.Url = s.GetPublicURL(key)
 	}
@@ -75,6 +80,7 @@ func (s *fileStorage) Upload(key string, reader io.Reader, contentType string, s
 	return file, nil
 }
 
+// Download downloads a file from the storage
 func (s *fileStorage) Download(key string) (io.ReadCloser, error) {
 	ctx := context.Background()
 
@@ -85,12 +91,13 @@ func (s *fileStorage) Download(key string) (io.ReadCloser, error) {
 
 	result, err := s.client.GetObject(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download file from R2: %w", err)
+		return nil, fmt.Errorf("failed to download file: %w", err)
 	}
 
 	return result.Body, nil
 }
 
+// Delete removes a file from the storage
 func (s *fileStorage) Delete(key string) error {
 	ctx := context.Background()
 
@@ -101,16 +108,16 @@ func (s *fileStorage) Delete(key string) error {
 
 	_, err := s.client.DeleteObject(ctx, input)
 	if err != nil {
-		return fmt.Errorf("failed to delete file from R2: %w", err)
+		return fmt.Errorf("failed to delete file: %w", err)
 	}
 
 	return nil
 }
 
+// GetPresignedURL generates a presigned URL for temporary access to a file
 func (s *fileStorage) GetPresignedURL(key string, expiry time.Duration) (string, error) {
 	ctx := context.Background()
 
-	// Create a presign client
 	presignClient := s3.NewPresignClient(s.client)
 
 	request := &s3.GetObjectInput{
@@ -118,7 +125,6 @@ func (s *fileStorage) GetPresignedURL(key string, expiry time.Duration) (string,
 		Key:    aws.String(key),
 	}
 
-	// Generate presigned URL
 	result, err := presignClient.PresignGetObject(ctx, request, func(opts *s3.PresignOptions) {
 		opts.Expires = expiry
 	})
@@ -130,29 +136,32 @@ func (s *fileStorage) GetPresignedURL(key string, expiry time.Duration) (string,
 	return result.URL, nil
 }
 
+// GetPublicURL returns the public URL for a file
 func (s *fileStorage) GetPublicURL(key string) string {
+	// Use custom domain if configured
 	if s.config.PublicDomain != "" {
 		return fmt.Sprintf("https://%s/%s", s.config.PublicDomain, key)
 	}
 
+	// Generate provider-specific public URLs
 	switch s.provider {
 	case StorageProviderR2:
 		return fmt.Sprintf("https://pub-%s.r2.dev/%s", s.config.AccountID, key)
+	default:
+		return ""
 	}
-
-	return ""
 }
 
+// BulkDelete deletes multiple files in batches
 func (s *fileStorage) BulkDelete(keys []string) error {
 	if len(keys) == 0 {
 		return nil
 	}
 
 	ctx := context.Background()
-
 	var allErrors []string
 
-	// Process files in batches
+	// Process files in batches of MaxBatchSize
 	for i := 0; i < len(keys); i += MaxBatchSize {
 		end := i + MaxBatchSize
 		if end > len(keys) {
@@ -165,17 +174,16 @@ func (s *fileStorage) BulkDelete(keys []string) error {
 		}
 	}
 
-	// Return all collected errors
 	if len(allErrors) > 0 {
-		return fmt.Errorf("bulk delete completed with errors: %v, %v", len(allErrors), allErrors[0])
+		return fmt.Errorf("bulk delete completed with %d error(s): %s",
+			len(allErrors), allErrors[0])
 	}
 
 	return nil
 }
 
-// deleteBatch deletes a single batch of files (up to 1000 objects)
+// deleteBatch deletes a single batch of files (up to MaxBatchSize objects)
 func (s *fileStorage) deleteBatch(ctx context.Context, keys []string) error {
-	// Convert keys to ObjectIdentifier slice
 	objects := make([]types.ObjectIdentifier, len(keys))
 	for i, key := range keys {
 		objects[i] = types.ObjectIdentifier{
@@ -183,16 +191,14 @@ func (s *fileStorage) deleteBatch(ctx context.Context, keys []string) error {
 		}
 	}
 
-	// Prepare delete input
 	input := &s3.DeleteObjectsInput{
 		Bucket: aws.String(s.config.BucketName),
 		Delete: &types.Delete{
 			Objects: objects,
-			Quiet:   aws.Bool(false), // Set to true to reduce response size if you don't need error details
+			Quiet:   aws.Bool(false),
 		},
 	}
 
-	// Execute bulk delete
 	result, err := s.client.DeleteObjects(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to execute bulk delete: %w", err)
@@ -200,22 +206,21 @@ func (s *fileStorage) deleteBatch(ctx context.Context, keys []string) error {
 
 	// Check for individual deletion errors
 	if len(result.Errors) > 0 {
-		var errorMessages []string
+		errorMessages := make([]string, 0, len(result.Errors))
 		for _, deleteError := range result.Errors {
-			errorMessages = append(errorMessages, fmt.Sprintf("key %s: %s",
-				aws.ToString(deleteError.Key), aws.ToString(deleteError.Message)))
+			errorMessages = append(errorMessages,
+				fmt.Sprintf("key %s: %s",
+					aws.ToString(deleteError.Key),
+					aws.ToString(deleteError.Message)))
 		}
-		return fmt.Errorf("some files failed to delete: %v", errorMessages)
+		return fmt.Errorf("failed to delete %d file(s): %v",
+			len(result.Errors), errorMessages)
 	}
 
 	return nil
 }
 
-func clearStringQuotes(s string) string {
-	var quotesRegex = regexp.MustCompile(`"`)
-	return quotesRegex.ReplaceAllString(s, "")
-}
-
+// GetFileForDownload retrieves a file with its metadata for download
 func (s *fileStorage) GetFileForDownload(key string) (*FileDownload, error) {
 	ctx := context.Background()
 
@@ -226,16 +231,14 @@ func (s *fileStorage) GetFileForDownload(key string) (*FileDownload, error) {
 
 	result, err := s.client.GetObject(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get file from R2: %w", err)
+		return nil, fmt.Errorf("failed to get file: %w", err)
 	}
 
-	// Extraer Content-Type
 	contentType := "application/octet-stream"
 	if result.ContentType != nil {
 		contentType = *result.ContentType
 	}
 
-	// Extraer tamaño
 	size := int64(0)
 	if result.ContentLength != nil {
 		size = *result.ContentLength
@@ -246,4 +249,9 @@ func (s *fileStorage) GetFileForDownload(key string) (*FileDownload, error) {
 		ContentType: contentType,
 		Size:        size,
 	}, nil
+}
+
+// clearStringQuotes removes quotes from strings (commonly found in ETags)
+func clearStringQuotes(s string) string {
+	return quotesRegex.ReplaceAllString(s, "")
 }
