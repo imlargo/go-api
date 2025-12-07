@@ -134,8 +134,12 @@ func (s *fileStorage) GetPublicURL(key string) string {
 		return fmt.Sprintf("https://%s/%s", s.config.PublicDomain, key)
 	}
 
-	// Default R2 public URL format
-	return fmt.Sprintf("https://pub-%s.r2.dev/%s", s.config.AccountID, key)
+	switch s.provider {
+	case StorageProviderR2:
+		return fmt.Sprintf("https://pub-%s.r2.dev/%s", s.config.AccountID, key)
+	}
+
+	return ""
 }
 
 func (s *fileStorage) BulkDelete(keys []string) error {
