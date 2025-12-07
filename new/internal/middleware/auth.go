@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/pkg/jwt"
-	"github.com/imlargo/go-api/pkg/responses"
+	"github.com/imlargo/go-api/pkg/medusa/jwt"
+	"github.com/imlargo/go-api/pkg/medusa/responses"
 )
 
 func AuthTokenMiddleware(jwtAuthenticator *jwt.JWT) gin.HandlerFunc {

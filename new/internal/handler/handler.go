@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/imlargo/go-api/pkg/logger"
+	"github.com/imlargo/go-api/pkg/medusa/logger"
 )
 
 type Handler struct {

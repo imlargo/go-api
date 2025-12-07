@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/imlargo/go-api/pkg/app"
-	"github.com/imlargo/go-api/pkg/env"
+	"github.com/imlargo/go-api/pkg/medusa/app"
+	"github.com/imlargo/go-api/pkg/medusa/env"
 )
 
 type Config struct {

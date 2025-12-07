@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/imlargo/go-api/pkg/logger"
+	"github.com/imlargo/go-api/pkg/medusa/logger"
 )
 
 type Server struct {
