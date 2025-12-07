@@ -13,7 +13,7 @@ import (
 
 var ErrUnsupportedStorageProvider = errors.New("unsupported storage provider")
 
-func GetStorageClient(provider StorageProvider, config StorageConfig) (*s3.Client, error) {
+func NewStorageClient(provider StorageProvider, config StorageConfig) (*s3.Client, error) {
 	switch provider {
 	case StorageProviderR2:
 		return NewR2Client(config)
