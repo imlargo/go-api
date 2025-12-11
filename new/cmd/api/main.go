@@ -14,6 +14,7 @@ func main() {
 	cfg := config.LoadConfig()
 
 	logger := logger.NewLogger()
+	defer logger.Sync()
 
 	router := gin.Default()
 	srv := http.NewServer(
