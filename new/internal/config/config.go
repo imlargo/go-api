@@ -29,7 +29,7 @@ func LoadConfig() Config {
 		Config: app.Config{
 			Server: app.ServerConfig{
 				Host: env.GetEnvString(API_URL, "localhost"),
-				Port: env.GetEnvString(PORT, "8000"),
+				Port: env.GetEnvInt(PORT, 8000),
 			},
 			Database: app.DbConfig{
 				URL: env.GetEnvString(DATABASE_URL, ""),

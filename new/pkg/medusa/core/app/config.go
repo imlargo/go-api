@@ -10,7 +10,7 @@ type Config struct {
 
 type ServerConfig struct {
 	Host string
-	Port string
+	Port int
 }
 
 type AuthConfig struct {
