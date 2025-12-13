@@ -10,7 +10,7 @@ type Store struct {
 	Transaction TransactionManager
 }
 
-func NewStore(db *gorm.DB, logger logger.Logger) *Store {
+func NewStore(db *gorm.DB, logger *logger.Logger) *Store {
 	return &Store{
 		BaseRepo:    NewRepository(db, logger),
 		Transaction: NewTransactionManager(db),

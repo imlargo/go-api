@@ -5,10 +5,24 @@ import (
 
 	"github.com/imlargo/go-api/pkg/medusa/core/app"
 	"github.com/imlargo/go-api/pkg/medusa/core/env"
+	"github.com/imlargo/go-api/pkg/medusa/services/storage"
 )
 
 type Config struct {
 	app.Config
+	RateLimiter RateLimiterConfig
+	Storage     storage.StorageConfig
+	Redis       RedisConfig
+}
+
+type RateLimiterConfig struct {
+	Enabled              bool
+	RequestsPerTimeFrame int
+	TimeFrame            time.Duration
+}
+
+type RedisConfig struct {
+	RedisURL string
 }
 
 func LoadConfig() Config {
@@ -39,6 +53,11 @@ func LoadConfig() Config {
 				TokenExpiration:   time.Duration(env.GetEnvInt(JWT_TOKEN_EXPIRATION, 15)) * time.Minute,
 				RefreshExpiration: time.Duration(env.GetEnvInt(JWT_REFRESH_EXPIRATION, 10080)) * time.Minute,
 			},
+		},
+		RateLimiter: RateLimiterConfig{
+			Enabled:              env.GetEnvBool(RATE_LIMITER_ENABLED, true),
+			RequestsPerTimeFrame: env.GetEnvInt(RATE_LIMITER_REQUESTS_PER_TIME_FRAME, 100),
+			TimeFrame:            time.Duration(env.GetEnvInt(RATE_LIMITER_TIME_FRAME_MINUTES, 1)) * time.Minute,
 		},
 	}
 }

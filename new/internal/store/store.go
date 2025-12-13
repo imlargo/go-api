@@ -6,13 +6,13 @@ import (
 )
 
 type Store struct {
-	medusarepo.Store
+	*medusarepo.Store
 	UserRepository repository.UserRepository
 }
 
-func NewStore(store medusarepo.Store) *Store {
+func NewStore(store *medusarepo.Store) *Store {
 	return &Store{
 		Store:          store,
-		UserRepository: repository.NewUserRepository(*store.BaseRepo),
+		UserRepository: repository.NewUserRepository(store.BaseRepo),
 	}
 }

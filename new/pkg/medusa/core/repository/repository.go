@@ -12,11 +12,11 @@ type ctxKey string
 const txKey ctxKey = "tx"
 
 type Repository struct {
-	logger logger.Logger
+	logger *logger.Logger
 	db     *gorm.DB
 }
 
-func NewRepository(db *gorm.DB, logger logger.Logger) *Repository {
+func NewRepository(db *gorm.DB, logger *logger.Logger) *Repository {
 	return &Repository{
 		db: db,
 	}

@@ -12,10 +12,10 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	medusarepo.Repository
+	*medusarepo.Repository
 }
 
-func NewUserRepository(repo medusarepo.Repository) UserRepository {
+func NewUserRepository(repo *medusarepo.Repository) UserRepository {
 	return &userRepository{Repository: repo}
 }
 
