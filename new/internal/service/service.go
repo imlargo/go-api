@@ -3,23 +3,23 @@ package service
 import (
 	"github.com/imlargo/go-api/internal/config"
 	"github.com/imlargo/go-api/internal/store"
-	"github.com/imlargo/go-api/pkg/medusa/core/logger"
+	medusaservice "github.com/imlargo/go-api/pkg/medusa/core/service"
 )
 
 type Service struct {
+	medusaservice.Service
 	store  *store.Store
-	logger *logger.Logger
 	config *config.Config
 }
 
 func NewService(
+	medusa medusaservice.Service,
 	store *store.Store,
-	logger *logger.Logger,
 	config *config.Config,
 ) *Service {
 	return &Service{
+		medusa,
 		store,
-		logger,
 		config,
 	}
 }
