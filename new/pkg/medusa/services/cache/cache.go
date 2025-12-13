@@ -22,8 +22,8 @@ type Service interface {
 	// Clear flushes the entire cache (use with caution)
 	Clear(ctx context.Context) error
 
-	// Remember gets from cache or executes fn and stores the result
-	Remember(ctx context.Context, key string, ttl time.Duration, fn func() (interface{}, error)) error
+	// Remember gets from cache or executes fn, stores and returns the result
+	Remember(ctx context.Context, key string, ttl time.Duration, dest interface{}, fn func() (interface{}, error)) error
 
 	// GetOrSet retrieves a value or sets a default if it doesn't exist
 	GetOrSet(ctx context.Context, key string, defaultValue interface{}, ttl time.Duration, dest interface{}) error
