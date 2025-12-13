@@ -13,7 +13,7 @@ type Config struct {
 
 func LoadConfig() Config {
 	err := env.CheckEnv([]string{
-		API_URL,
+		HOST,
 		PORT,
 		DATABASE_URL,
 		JWT_SECRET,
@@ -28,7 +28,7 @@ func LoadConfig() Config {
 	return Config{
 		Config: app.Config{
 			Server: app.ServerConfig{
-				Host: env.GetEnvString(API_URL, "localhost"),
+				Host: env.GetEnvString(HOST, "localhost"),
 				Port: env.GetEnvInt(PORT, 8000),
 			},
 			Database: app.DbConfig{
