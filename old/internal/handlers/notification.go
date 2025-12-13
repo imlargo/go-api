@@ -187,6 +187,7 @@ func (u *NotificationHandler) SubscribePush(c *gin.Context) {
 	userID := c.Param("userID")
 	if userID == "" {
 		responses.ErrorBadRequest(c, "userID is required")
+		return
 	}
 
 	userIDInt, err := strconv.Atoi(userID)
@@ -202,7 +203,7 @@ func (u *NotificationHandler) SubscribePush(c *gin.Context) {
 
 	subscription, err2 := u.notificationService.SubscribePush(uint(userIDInt), sub.Endpoint, sub.Keys.P256dh, sub.Keys.Auth)
 	if err2 != nil {
-		responses.ErrorInternalServer(c)
+		responses.ErrorInternalServerWithMessage(c, "Failed to subscribe to push notifications")
 		return
 	}
 
@@ -258,7 +259,7 @@ func (u *NotificationHandler) DispatchPush(c *gin.Context) {
 func (u *NotificationHandler) GetSSESubscriptions(c *gin.Context) {
 	subscriptions := u.notificationService.GetSSESubscriptions()
 	if subscriptions == nil {
-		responses.ErrorInternalServer(c)
+		responses.ErrorInternalServerWithMessage(c, "Failed to retrieve SSE subscriptions")
 		return
 	}
 
@@ -364,7 +365,7 @@ func (u *NotificationHandler) GetPushSubscription(c *gin.Context) {
 	}
 
 	if subscription == nil {
-		responses.ErrorNotFound(c, "Subscription not found")
+		responses.ErrorNotFound(c, "Subscription")
 		return
 	}
 

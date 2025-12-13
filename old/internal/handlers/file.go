@@ -40,6 +40,7 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
 		responses.ErrorBadRequest(c, "Invalid file: "+err.Error())
+		return
 	}
 
 	result, err := h.fileService.UploadFileFromMultipart(file)
@@ -73,7 +74,7 @@ func (h *FileHandler) GetFile(c *gin.Context) {
 
 	file, err := h.fileService.GetFile(uint(id))
 	if err != nil {
-		responses.ErrorNotFound(c, err.Error())
+		responses.ErrorNotFound(c, "File")
 		return
 	}
 

@@ -1,4 +1,4 @@
-.PHONY: swag migrations build format
+.PHONY: swag migrations build format repurpose
 
 SWAG_BIN=~/go/bin/swag
 MAIN_FILE=cmd/api/main.go
@@ -15,3 +15,6 @@ build:
 
 format:
 	go fmt ./...
+
+repurpose:
+	go run cmd/repurposer-cli/main.go "tmp/input/input.mov" "tmp/final"

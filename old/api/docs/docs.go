@@ -611,6 +611,374 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/marketplace/analytics": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve marketplace analytics including total revenue, orders, sellers, and services stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get marketplace analytics dashboard data",
+                "responses": {
+                    "200": {
+                        "description": "Marketplace analytics data",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceAnalytics"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/analytics/category-distribution": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve distribution of orders and revenue by category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get marketplace category distribution",
+                "responses": {
+                    "200": {
+                        "description": "Category distribution data",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.CategoryDistribution"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/analytics/orders-by-status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve count of marketplace orders grouped by status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get marketplace orders by status",
+                "responses": {
+                    "200": {
+                        "description": "Orders count by status",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.OrdersByStatus"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/analytics/revenue": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve marketplace revenue grouped by day, week, or month",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get marketplace revenue by period",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "month",
+                        "description": "Period (day, week, month)",
+                        "name": "period",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 30,
+                        "description": "Number of days to look back",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revenue data by period",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.RevenueByPeriod"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/analytics/top-sellers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve top performing sellers by revenue or order count",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get top marketplace sellers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of sellers to return",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Top sellers list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.TopSeller"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/analytics/top-services": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve top performing services by revenue or order count",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get top marketplace services",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of services to return",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Top services list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.TopService"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/categories": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all marketplace categories with service counts and order stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get all marketplace categories with admin details",
+                "responses": {
+                    "200": {
+                        "description": "List of categories with analytics",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceCategoryDto"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all marketplace orders with buyer, seller, and service details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get all marketplace orders with admin details",
+                "responses": {
+                    "200": {
+                        "description": "List of all orders",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/sellers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all marketplace sellers with service counts and order stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get all marketplace sellers with admin details",
+                "responses": {
+                    "200": {
+                        "description": "List of sellers with analytics",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceSellerDto"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/marketplace/services": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all marketplace services with order stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin-marketplace"
+                ],
+                "summary": "Get all marketplace services with admin details",
+                "responses": {
+                    "200": {
+                        "description": "List of services with analytics",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceServiceDto"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/subscriptions": {
             "get": {
                 "security": [
@@ -2617,7 +2985,7 @@ const docTemplate = `{
                 "summary": "Get All Marketplace Categories",
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Categories",
+                        "description": "List of marketplace categories",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -2709,13 +3077,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Marketplace category",
+                        "description": "Marketplace category details",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -2760,6 +3134,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -2809,13 +3189,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Marketplace category",
+                        "description": "Marketplace category details",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceCategory"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -2874,6 +3260,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -2970,6 +3368,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3016,7 +3426,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Service Orders",
+                        "description": "List of marketplace service orders",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -3125,6 +3535,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3165,6 +3581,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3225,6 +3647,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3279,6 +3707,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3388,6 +3828,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3433,6 +3885,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3489,6 +3947,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3595,6 +4065,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3649,6 +4131,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3749,6 +4243,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3805,6 +4305,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3850,6 +4362,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -3903,6 +4427,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3938,7 +4468,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Service Packages",
+                        "description": "List of marketplace service packages",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -3990,7 +4520,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Marketplace",
+                        "description": "Marketplace service package details",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage"
                         }
@@ -4047,6 +4577,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4087,6 +4623,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -4147,6 +4689,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4182,7 +4730,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Service Results",
+                        "description": "List of marketplace service results",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -4294,6 +4842,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4334,6 +4888,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -4396,6 +4956,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4422,7 +4994,7 @@ const docTemplate = `{
                 "summary": "Get All Marketplace Sellers",
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Sellers",
+                        "description": "List of marketplace sellers",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -4506,7 +5078,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Marketplace user ID",
+                        "description": "User ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -4514,9 +5086,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Is user a Marketplace Seller",
+                        "description": "Is user a marketplace seller",
                         "schema": {
                             "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
                     "500": {
@@ -4565,6 +5143,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4605,6 +5189,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -4665,6 +5255,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4711,7 +5307,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of Marketplace Services",
+                        "description": "List of marketplace services",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -4774,6 +5370,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "marketplace_category_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "name": "platform_commission",
                         "in": "formData"
                     },
                     {
@@ -4868,6 +5469,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4912,6 +5519,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -4928,7 +5541,7 @@ const docTemplate = `{
                 ],
                 "description": "Update an existing marketplace service",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -4971,6 +5584,11 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
+                        "type": "number",
+                        "name": "platform_commission",
+                        "in": "formData"
+                    },
+                    {
                         "type": "integer",
                         "name": "seller_id",
                         "in": "formData"
@@ -4999,13 +5617,190 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Image to upload",
                         "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Marketplace service details",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/marketplace/services/{id}/details": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update basic details of a marketplace service (title, description, spots, category)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "marketplace"
+                ],
+                "summary": "Patch Marketplace Service Details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Marketplace service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Service details to update",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated marketplace service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/marketplace/services/{id}/image": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the image of a marketplace service",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "marketplace"
+                ],
+                "summary": "Patch Marketplace Service Image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Marketplace service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "New image file",
+                        "name": "image",
                         "in": "formData",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Marketplace service details",
+                        "description": "Updated marketplace service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/marketplace/services/{id}/seller": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change the seller of a marketplace service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "marketplace"
+                ],
+                "summary": "Patch Marketplace Service Seller",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Marketplace service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New seller ID",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceSeller"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated marketplace service",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
                         }
@@ -6137,7 +6932,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Automatically sync posts from Instagram by comparing video hashes",
+                "description": "Automatically sync posts from Instagram by comparing video hashes. This endpoint returns immediately and processing happens in the background.",
                 "consumes": [
                     "application/json"
                 ],
@@ -6161,7 +6956,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Sync completed successfully",
+                        "description": "Sync started successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -6436,6 +7231,90 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.ReferralMetricsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/referrals/referred-users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a list of users who registered using the owner's referral codes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "referrals"
+                ],
+                "summary": "Get referred users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by subscription status (active, canceled, inactive)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by registration date from (YYYY-MM-DD)",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by registration date to (YYYY-MM-DD)",
+                        "name": "date_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by field (name, email, registered_at, subscription_status, plan_type)",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (asc, desc)",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20, max 100)",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUsersListResponse"
                         }
                     },
                     "401": {
@@ -6922,6 +7801,1049 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Task not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/categories": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all marketplace categories (read-only for sellers)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Get All Categories",
+                "responses": {
+                    "200": {
+                        "description": "List of categories",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/packages": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new package for a service owned by the authenticated seller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Create Service Package",
+                "parameters": [
+                    {
+                        "description": "Package details",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.CreateMarketplaceServicePackage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created package",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/packages/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a package for a service owned by the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Delete Service Package",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Package ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a package for a service owned by the authenticated seller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Update Service Package",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Package ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated package details",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceServicePackage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated package",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/profile": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the seller profile for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Get Seller Profile by User ID",
+                "responses": {
+                    "200": {
+                        "description": "Seller profile",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the seller profile for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Update Seller Profile",
+                "parameters": [
+                    {
+                        "description": "Updated seller details",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceSeller"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated seller profile",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/results": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Upload a result image for a service owned by the authenticated seller",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Create Service Result",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "service_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created result",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/results/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a result image for a service owned by the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Delete Service Result",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Result ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all services for the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Get Seller Services",
+                "responses": {
+                    "200": {
+                        "description": "List of seller services",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceServiceDto"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new service for the authenticated seller",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Create Seller Service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "available_spots",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "disclaimer",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "expectations",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "marketplace_category_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "name": "platform_commission",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "seller_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "steps_to_start",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "terms_in",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image to upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a service owned by the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Delete Seller Service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing service owned by the authenticated seller",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Update Seller Service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "available_spots",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "disclaimer",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "expectations",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "marketplace_category_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "name": "platform_commission",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "seller_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "steps_to_start",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "terms_in",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "user_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image to upload",
+                        "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services/{id}/details": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update basic details of a service owned by the authenticated seller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Update Seller Service Details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Service details to update",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services/{id}/image": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the image of a service owned by the authenticated seller",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Update Seller Service Image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "New image file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated service",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services/{id}/packages": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all packages for a specific service owned by the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Get Service Packages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of service packages",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seller/marketplace/services/{id}/results": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all result images for a service owned by the authenticated seller",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller-marketplace"
+                ],
+                "summary": "Get Service Results",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of service results",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -7967,6 +9889,68 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a generated content using v2 system (only is_posted field can be updated)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "content-v2"
+                ],
+                "summary": "Update generated content by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Generated Content ID to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Generated content update payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateGeneratedContent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Generated content updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.GeneratedContent"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Generated content not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/v2/content/generation/events": {
@@ -8048,6 +10032,64 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/content/generation/latest-status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the most recent generation status for an account (active or completed)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generation"
+                ],
+                "summary": "Get latest generation status for account",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID to check status",
+                        "name": "account_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content type filter (video, story, slideshow)",
+                        "name": "content_type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Latest generation status retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.AccountGenerationStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No generation found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -8381,6 +10423,58 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Content account assignment not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/posts/sync/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get current sync status for an account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get sync status for account",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID to check status",
+                        "name": "account_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sync status retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.AccountSyncStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No active sync found",
                         "schema": {
                             "$ref": "#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse"
                         }
@@ -8775,6 +10869,153 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_nicolailuther_butter_internal_dto.AdminMarketplaceCategoryDto": {
+            "type": "object",
+            "properties": {
+                "_orders": {
+                    "type": "integer"
+                },
+                "_sellers": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "service_count": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.AdminMarketplaceSellerDto": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "service_count": {
+                    "type": "integer"
+                },
+                "total_orders": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.AdminMarketplaceServiceDto": {
+            "type": "object",
+            "properties": {
+                "_seller": {
+                    "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller"
+                },
+                "available_spots": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "disclaimer": {
+                    "type": "string"
+                },
+                "expectations": {
+                    "type": "string"
+                },
+                "file_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "$ref": "#/definitions/github_com_nicolailuther_butter_internal_models.File"
+                },
+                "marketplace_category_id": {
+                    "type": "integer"
+                },
+                "max_price": {
+                    "type": "number"
+                },
+                "min_price": {
+                    "type": "number"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "platform_commission": {
+                    "type": "number"
+                },
+                "seller_id": {
+                    "type": "integer"
+                },
+                "seller_name": {
+                    "type": "string"
+                },
+                "steps_to_start": {
+                    "type": "string"
+                },
+                "terms_in": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_nicolailuther_butter_internal_dto.AuthAttemptStatusResponse": {
             "type": "object",
             "properties": {
@@ -8862,6 +11103,29 @@ const docTemplate = `{
                 },
                 "reason": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.CategoryDistribution": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "revenue": {
+                    "type": "number"
+                },
+                "service_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -9328,6 +11592,41 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_nicolailuther_butter_internal_dto.MarketplaceAnalytics": {
+            "type": "object",
+            "properties": {
+                "active_disputes": {
+                    "type": "integer"
+                },
+                "average_order_value": {
+                    "type": "number"
+                },
+                "completed_orders": {
+                    "type": "integer"
+                },
+                "monthly_revenue": {
+                    "type": "number"
+                },
+                "pending_orders": {
+                    "type": "integer"
+                },
+                "total_categories": {
+                    "type": "integer"
+                },
+                "total_orders": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "total_sellers": {
+                    "type": "integer"
+                },
+                "total_services": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult": {
             "type": "object",
             "properties": {
@@ -9398,6 +11697,9 @@ const docTemplate = `{
                 },
                 "orders_count": {
                     "type": "integer"
+                },
+                "platform_commission": {
+                    "type": "number"
                 },
                 "seller_id": {
                     "type": "integer"
@@ -9472,6 +11774,63 @@ const docTemplate = `{
                 },
                 "category": {
                     "$ref": "#/definitions/github_com_nicolailuther_butter_internal_enums.OnlyfansRevenueType"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.OrdersByStatus": {
+            "type": "object",
+            "properties": {
+                "cancelled": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "integer"
+                },
+                "delivered": {
+                    "type": "integer"
+                },
+                "disputed": {
+                    "type": "integer"
+                },
+                "in_progress": {
+                    "type": "integer"
+                },
+                "paid": {
+                    "type": "integer"
+                },
+                "pending_payment": {
+                    "type": "integer"
+                },
+                "refunded": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.PatchServiceDetails": {
+            "type": "object",
+            "properties": {
+                "available_spots": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "marketplace_category_id": {
+                    "type": "integer"
+                },
+                "platform_commission": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.PatchServiceSeller": {
+            "type": "object",
+            "properties": {
+                "seller_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -9583,6 +11942,94 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_nicolailuther_butter_internal_dto.ReferredUserResponse": {
+            "type": "object",
+            "properties": {
+                "current_period_end": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "months_subscribed": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan_type": {
+                    "type": "string"
+                },
+                "referral_code": {
+                    "type": "string"
+                },
+                "registered_at": {
+                    "type": "string"
+                },
+                "subscription_status": {
+                    "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUserSubscriptionStatus"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.ReferredUserSubscriptionStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "canceled",
+                "inactive"
+            ],
+            "x-enum-varnames": [
+                "ReferredUserSubscriptionStatusActive",
+                "ReferredUserSubscriptionStatusCanceled",
+                "ReferredUserSubscriptionStatusInactive"
+            ]
+        },
+        "github_com_nicolailuther_butter_internal_dto.ReferredUsersListResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUsersSummary"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUserResponse"
+                    }
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.ReferredUsersSummary": {
+            "type": "object",
+            "properties": {
+                "active_subscribers": {
+                    "type": "integer"
+                },
+                "canceled_subscribers": {
+                    "type": "integer"
+                },
+                "inactive_subscribers": {
+                    "type": "integer"
+                },
+                "total_months_generated": {
+                    "type": "integer"
+                },
+                "total_referred": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_nicolailuther_butter_internal_dto.RegisterUserRequest": {
             "type": "object",
             "properties": {
@@ -9635,6 +12082,20 @@ const docTemplate = `{
                 },
                 "seller_response": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.RevenueByPeriod": {
+            "type": "object",
+            "properties": {
+                "orders_count": {
+                    "type": "integer"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "revenue": {
+                    "type": "number"
                 }
             }
         },
@@ -9726,6 +12187,49 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_nicolailuther_butter_internal_dto.TopSeller": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "seller_id": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_dto.TopService": {
+            "type": "object",
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "seller_name": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "total_revenue": {
+                    "type": "number"
+                }
+            }
+        },
         "github_com_nicolailuther_butter_internal_dto.TrackPostRequest": {
             "type": "object",
             "properties": {
@@ -9742,6 +12246,12 @@ const docTemplate = `{
             "properties": {
                 "account_role": {
                     "$ref": "#/definitions/github_com_nicolailuther_butter_internal_enums.AccountRole"
+                },
+                "auto_generate_enabled": {
+                    "type": "boolean"
+                },
+                "auto_generate_hour": {
+                    "type": "integer"
                 },
                 "bio_request": {
                     "type": "string"
@@ -9837,6 +12347,17 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_nicolailuther_butter_internal_dto.UpdateGeneratedContent": {
+            "type": "object",
+            "properties": {
+                "is_posted": {
+                    "type": "boolean"
+                },
+                "maybe_posted": {
+                    "type": "boolean"
+                }
+            }
+        },
         "github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceCategory": {
             "type": "object",
             "properties": {
@@ -9870,6 +12391,9 @@ const docTemplate = `{
                 },
                 "nickname": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -10077,6 +12601,27 @@ const docTemplate = `{
                 "DisputeStatusClosed"
             ]
         },
+        "github_com_nicolailuther_butter_internal_enums.GenerationErrorCode": {
+            "type": "string",
+            "enum": [
+                "",
+                "limit_exceeded",
+                "no_content_available",
+                "no_content_files",
+                "unsupported_type",
+                "unsupported_platform",
+                "unknown"
+            ],
+            "x-enum-varnames": [
+                "GenerationErrorCodeNone",
+                "GenerationErrorCodeLimitExceeded",
+                "GenerationErrorCodeNoContentAvailable",
+                "GenerationErrorCodeNoContentFiles",
+                "GenerationErrorCodeUnsupportedType",
+                "GenerationErrorCodeUnsupportedPlatform",
+                "GenerationErrorCodeUnknown"
+            ]
+        },
         "github_com_nicolailuther_butter_internal_enums.GenerationStatus": {
             "type": "string",
             "enum": [
@@ -10272,6 +12817,21 @@ const docTemplate = `{
                 "RevisionRequestStatusCompleted"
             ]
         },
+        "github_com_nicolailuther_butter_internal_enums.SyncStatus": {
+            "type": "string",
+            "enum": [
+                "syncing",
+                "completed",
+                "failed",
+                "partial"
+            ],
+            "x-enum-varnames": [
+                "SyncStatusSyncing",
+                "SyncStatusCompleted",
+                "SyncStatusFailed",
+                "SyncStatusPartial"
+            ]
+        },
         "github_com_nicolailuther_butter_internal_enums.TaskPriority": {
             "type": "integer",
             "enum": [
@@ -10378,6 +12938,12 @@ const docTemplate = `{
                 },
                 "account_url": {
                     "type": "string"
+                },
+                "auto_generate_enabled": {
+                    "type": "boolean"
+                },
+                "auto_generate_hour": {
+                    "type": "integer"
                 },
                 "average_views": {
                     "type": "integer"
@@ -10495,6 +13061,9 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "error_code": {
+                    "$ref": "#/definitions/github_com_nicolailuther_butter_internal_enums.GenerationErrorCode"
+                },
                 "error_message": {
                     "description": "Error tracking",
                     "type": "string"
@@ -10531,6 +13100,59 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "total_requested": {
+                    "description": "Progress tracking",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_nicolailuther_butter_internal_models.AccountSyncStatus": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "description": "Error tracking",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "description": "IsActive flag for unique constraint - only one active sync per account",
+                    "type": "boolean"
+                },
+                "started_at": {
+                    "description": "Timing",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Status - acts as lock when status is 'syncing'",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_nicolailuther_butter_internal_enums.SyncStatus"
+                        }
+                    ]
+                },
+                "total_failed": {
+                    "type": "integer"
+                },
+                "total_processed": {
+                    "type": "integer"
+                },
+                "total_synced": {
+                    "type": "integer"
+                },
+                "total_to_process": {
                     "description": "Progress tracking",
                     "type": "integer"
                 },
@@ -10912,6 +13534,9 @@ const docTemplate = `{
                     "description": "Posted status",
                     "type": "boolean"
                 },
+                "maybe_posted": {
+                    "type": "boolean"
+                },
                 "text_overlay_id": {
                     "type": "integer"
                 },
@@ -11290,6 +13915,9 @@ const docTemplate = `{
                 },
                 "marketplace_category_id": {
                     "type": "integer"
+                },
+                "platform_commission": {
+                    "type": "number"
                 },
                 "seller_id": {
                     "type": "integer"

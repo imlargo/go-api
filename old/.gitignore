@@ -43,6 +43,11 @@ bin/
 # Logs
 logs
 *.log
+butter-core
+butter-api
 
 # Generated binaries
 main
+content-migration
+repurposer
+reconcile

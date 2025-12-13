@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/nicolailuther/butter/api/docs"
 	"github.com/nicolailuther/butter/internal/cache"
@@ -90,6 +92,7 @@ func (app *Application) Mount() {
 	paymentService := services.NewPaymentService(serviceContainer)
 	marketplaceService := services.NewMarketplaceService(serviceContainer, fileService, chatService, notificationService, stripeClient, emailClient)
 	marketplaceOrderManagementService := services.NewMarketplaceOrderManagementService(serviceContainer, notificationService, fileService, marketplaceService, emailClient)
+	adminMarketplaceService := services.NewAdminMarketplaceService(serviceContainer)
 	managementService := services.NewManagementService(serviceContainer, clientsService, accountService, userService)
 
 	// Task Manager (read-only for API - no task processing)
@@ -121,11 +124,19 @@ func (app *Application) Mount() {
 
 	// Generation lock and status services (required for concurrent generation)
 	generationLockService := services.NewGenerationLockService(serviceContainer)
-	generationStatusService := services.NewGenerationStatusService(serviceContainer)
+	generationStatusService := services.NewGenerationStatusService(serviceContainer, generationLockService)
 
 	// Reconcile generation locks on startup
 	if err := generationLockService.ReconcileLocksOnStartup(); err != nil {
 		app.Logger.Warnw("Failed to reconcile generation locks", "error", err)
+	}
+
+	// Reconcile stuck statuses on startup (statuses stuck for more than 6 hours)
+	stuckDuration := 6 * time.Hour
+	if fixedCount, err := generationStatusService.ReconcileStuckStatuses(stuckDuration); err != nil {
+		app.Logger.Warnw("Failed to reconcile stuck statuses", "error", err)
+	} else if fixedCount > 0 {
+		app.Logger.Infow("Reconciled stuck statuses on startup", "fixed_count", fixedCount)
 	}
 
 	// Sync status service (acts as both status and lock for post sync)
@@ -156,7 +167,7 @@ func (app *Application) Mount() {
 		fileService,
 	)
 	app.Logger.Info("Content generation configured with concurrent task queue processing")
-	postService := services.NewPostService(serviceContainer, fileService, contentServiceV2, socialMediaGateway)
+	postService := services.NewPostService(serviceContainer, fileService, contentServiceV2, socialMediaGateway, syncStatusService)
 	dashboardService := services.NewDashboardService(serviceContainer, insightsService, onlyfansServiceGateway)
 	referralService := services.NewReferralService(serviceContainer)
 
@@ -176,6 +187,8 @@ func (app *Application) Mount() {
 	webhookHandler := handlers.NewWebhookHandler(handlerContainer, subscriptionService, marketplaceService, paymentService, stripeClient)
 	marketplaceHandler := handlers.NewMarketplaceHandler(handlerContainer, marketplaceService)
 	marketplaceOrderManagementHandler := handlers.NewMarketplaceOrderManagementHandler(handlerContainer, marketplaceOrderManagementService)
+	adminMarketplaceHandler := handlers.NewAdminMarketplaceHandler(handlerContainer, adminMarketplaceService)
+	sellerMarketplaceHandler := handlers.NewSellerMarketplaceHandler(handlerContainer, marketplaceService)
 	managementHandler := handlers.NewManagementHandler(handlerContainer, managementService)
 	contentHandlerV2 := handlers.NewContentHandler(handlerContainer, contentServiceV2)
 	postHandler := handlers.NewPostHandler(handlerContainer, postService)
@@ -298,6 +311,9 @@ func (app *Application) Mount() {
 	marketplace.GET("/services/:id", marketplaceHandler.GetServiceByID)
 	marketplace.POST("/services", marketplaceHandler.CreateService)
 	marketplace.PATCH("/services/:id", marketplaceHandler.UpdateService)
+	marketplace.PATCH("/services/:id/details", marketplaceHandler.PatchServiceDetails)
+	marketplace.PATCH("/services/:id/seller", marketplaceHandler.PatchServiceSeller)
+	marketplace.PATCH("/services/:id/image", marketplaceHandler.PatchServiceImage)
 	marketplace.DELETE("/services/:id", marketplaceHandler.DeleteService)
 
 	marketplace.GET("/results", marketplaceHandler.GetAllServiceResultsByService)
@@ -358,6 +374,38 @@ func (app *Application) Mount() {
 	// Admin - Subscriptions
 	v1.GET("/admin/subscriptions", subscriptionHandler.GetAllSubscriptions)
 
+	// Admin - Marketplace Management
+	adminMarketplace := v1.Group("/admin/marketplace")
+	adminMarketplace.GET("/categories", adminMarketplaceHandler.GetAllCategories)
+	adminMarketplace.GET("/sellers", adminMarketplaceHandler.GetAllSellers)
+	adminMarketplace.GET("/services", adminMarketplaceHandler.GetAllServices)
+	adminMarketplace.GET("/orders", adminMarketplaceHandler.GetAllOrders)
+	adminMarketplace.GET("/analytics", adminMarketplaceHandler.GetMarketplaceAnalytics)
+	adminMarketplace.GET("/analytics/revenue", adminMarketplaceHandler.GetRevenueByPeriod)
+	adminMarketplace.GET("/analytics/orders-by-status", adminMarketplaceHandler.GetOrdersByStatus)
+	adminMarketplace.GET("/analytics/top-sellers", adminMarketplaceHandler.GetTopSellers)
+	adminMarketplace.GET("/analytics/top-services", adminMarketplaceHandler.GetTopServices)
+	adminMarketplace.GET("/analytics/category-distribution", adminMarketplaceHandler.GetCategoryDistribution)
+
+	// Seller - Marketplace Management (sellers can manage their own profile, services, packages, and results)
+	sellerMarketplace := v1.Group("/seller/marketplace")
+	sellerMarketplace.GET("/profile", sellerMarketplaceHandler.GetSellerProfile)
+	sellerMarketplace.PATCH("/profile", sellerMarketplaceHandler.UpdateSellerProfile)
+	sellerMarketplace.GET("/categories", sellerMarketplaceHandler.GetAllCategories)
+	sellerMarketplace.GET("/services", sellerMarketplaceHandler.GetSellerServices)
+	sellerMarketplace.POST("/services", sellerMarketplaceHandler.CreateService)
+	sellerMarketplace.PATCH("/services/:id", sellerMarketplaceHandler.UpdateService)
+	sellerMarketplace.PATCH("/services/:id/details", sellerMarketplaceHandler.UpdateServiceDetails)
+	sellerMarketplace.PATCH("/services/:id/image", sellerMarketplaceHandler.UpdateServiceImage)
+	sellerMarketplace.DELETE("/services/:id", sellerMarketplaceHandler.DeleteService)
+	sellerMarketplace.GET("/services/:id/packages", sellerMarketplaceHandler.GetServicePackages)
+	sellerMarketplace.GET("/services/:id/results", sellerMarketplaceHandler.GetServiceResults)
+	sellerMarketplace.POST("/packages", sellerMarketplaceHandler.CreateServicePackage)
+	sellerMarketplace.PATCH("/packages/:id", sellerMarketplaceHandler.UpdateServicePackage)
+	sellerMarketplace.DELETE("/packages/:id", sellerMarketplaceHandler.DeleteServicePackage)
+	sellerMarketplace.POST("/results", sellerMarketplaceHandler.CreateServiceResult)
+	sellerMarketplace.DELETE("/results/:id", sellerMarketplaceHandler.DeleteServiceResult)
+
 	// OnlyFans integration
 	v1.POST("/onlyfans/accounts", onlyfansHandler.CreateOnlyfansAccount)
 	v1.POST("/onlyfans/reconnect", onlyfansHandler.ReconnectAccount)
@@ -402,6 +450,7 @@ func (app *Application) Mount() {
 	v1.GET("/referrals", referralHandler.GetUserReferralCodes)
 	v1.POST("/referrals", referralHandler.CreateReferralCode)
 	v1.GET("/referrals/metrics", referralHandler.GetReferralMetrics)
+	v1.GET("/referrals/referred-users", referralHandler.GetReferredUsers)
 	v1.GET("/referrals/check/:code", referralHandler.CheckCodeAvailability)
 	v1.POST("/referrals/generate", referralHandler.GenerateCode)
 	v1.GET("/referrals/:id", referralHandler.GetReferralCode)
@@ -433,6 +482,7 @@ func (app *Application) Mount() {
 	contentV2.POST("/generate", contentHandlerV2.GenerateContent)
 	contentV2.GET("/generated", contentHandlerV2.GetGeneratedContent)
 	contentV2.GET("/generated/:id", contentHandlerV2.GetGeneratedContentByID)
+	contentV2.PATCH("/generated/:id", contentHandlerV2.UpdateGeneratedContent)
 	contentV2.DELETE("/generated/:id", contentHandlerV2.DeleteGeneratedContent)
 
 	// Generation status endpoints (concurrent generation system)

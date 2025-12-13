@@ -7,4 +7,5 @@ const (
 	errBadRequest     = "BAD_REQUEST"
 	errToManyRequests = "TOO_MANY_REQUESTS"
 	errUnauthorized   = "UNAUTHORIZED"
+	errForbidden      = "FORBIDDEN"
 )

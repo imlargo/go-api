@@ -40,6 +40,10 @@ func ErrorUnauthorized(c *gin.Context, message string) {
 	NewErrorResponse(c, http.StatusUnauthorized, message, errUnauthorized)
 }
 
+func ErrorForbidden(c *gin.Context, message string) {
+	NewErrorResponse(c, http.StatusForbidden, message, errForbidden)
+}
+
 func NewErrorResponse(c *gin.Context, code int, message string, status string) {
 	c.JSON(code, ErrorResponse{
 		Code:    code,

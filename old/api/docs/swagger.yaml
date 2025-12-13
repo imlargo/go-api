@@ -71,6 +71,103 @@ definitions:
       username:
         type: string
     type: object
+  github_com_nicolailuther_butter_internal_dto.AdminMarketplaceCategoryDto:
+    properties:
+      _orders:
+        type: integer
+      _sellers:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      service_count:
+        type: integer
+      total_revenue:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  github_com_nicolailuther_butter_internal_dto.AdminMarketplaceSellerDto:
+    properties:
+      bio:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      nickname:
+        type: string
+      service_count:
+        type: integer
+      total_orders:
+        type: integer
+      total_revenue:
+        type: number
+      updated_at:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  github_com_nicolailuther_butter_internal_dto.AdminMarketplaceServiceDto:
+    properties:
+      _seller:
+        $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller'
+      available_spots:
+        type: integer
+      category_name:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      disclaimer:
+        type: string
+      expectations:
+        type: string
+      file_id:
+        type: integer
+      id:
+        type: integer
+      image:
+        $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.File'
+      marketplace_category_id:
+        type: integer
+      max_price:
+        type: number
+      min_price:
+        type: number
+      orders_count:
+        type: integer
+      platform_commission:
+        type: number
+      seller_id:
+        type: integer
+      seller_name:
+        type: string
+      steps_to_start:
+        type: string
+      terms_in:
+        type: string
+      title:
+        type: string
+      total_revenue:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   github_com_nicolailuther_butter_internal_dto.AuthAttemptStatusResponse:
     properties:
       account:
@@ -128,6 +225,21 @@ definitions:
         type: string
     required:
     - order_id
+    type: object
+  github_com_nicolailuther_butter_internal_dto.CategoryDistribution:
+    properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      orders_count:
+        type: integer
+      percentage:
+        type: number
+      revenue:
+        type: number
+      service_count:
+        type: integer
     type: object
   github_com_nicolailuther_butter_internal_dto.ChangePasswordRequest:
     properties:
@@ -435,6 +547,29 @@ definitions:
       user_id:
         type: integer
     type: object
+  github_com_nicolailuther_butter_internal_dto.MarketplaceAnalytics:
+    properties:
+      active_disputes:
+        type: integer
+      average_order_value:
+        type: number
+      completed_orders:
+        type: integer
+      monthly_revenue:
+        type: number
+      pending_orders:
+        type: integer
+      total_categories:
+        type: integer
+      total_orders:
+        type: integer
+      total_revenue:
+        type: number
+      total_sellers:
+        type: integer
+      total_services:
+        type: integer
+    type: object
   github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult:
     properties:
       _orders:
@@ -482,6 +617,8 @@ definitions:
         type: number
       orders_count:
         type: integer
+      platform_commission:
+        type: number
       seller_id:
         type: integer
       steps_to_start:
@@ -530,6 +667,43 @@ definitions:
         type: number
       category:
         $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.OnlyfansRevenueType'
+    type: object
+  github_com_nicolailuther_butter_internal_dto.OrdersByStatus:
+    properties:
+      cancelled:
+        type: integer
+      completed:
+        type: integer
+      delivered:
+        type: integer
+      disputed:
+        type: integer
+      in_progress:
+        type: integer
+      paid:
+        type: integer
+      pending_payment:
+        type: integer
+      refunded:
+        type: integer
+    type: object
+  github_com_nicolailuther_butter_internal_dto.PatchServiceDetails:
+    properties:
+      available_spots:
+        type: integer
+      description:
+        type: string
+      marketplace_category_id:
+        type: integer
+      platform_commission:
+        type: number
+      title:
+        type: string
+    type: object
+  github_com_nicolailuther_butter_internal_dto.PatchServiceSeller:
+    properties:
+      seller_id:
+        type: integer
     type: object
   github_com_nicolailuther_butter_internal_dto.PushNotificationRequestPayload:
     properties:
@@ -602,6 +776,65 @@ definitions:
       total_registrations:
         type: integer
     type: object
+  github_com_nicolailuther_butter_internal_dto.ReferredUserResponse:
+    properties:
+      current_period_end:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      months_subscribed:
+        type: integer
+      name:
+        type: string
+      plan_type:
+        type: string
+      referral_code:
+        type: string
+      registered_at:
+        type: string
+      subscription_status:
+        $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUserSubscriptionStatus'
+    type: object
+  github_com_nicolailuther_butter_internal_dto.ReferredUserSubscriptionStatus:
+    enum:
+    - active
+    - canceled
+    - inactive
+    type: string
+    x-enum-varnames:
+    - ReferredUserSubscriptionStatusActive
+    - ReferredUserSubscriptionStatusCanceled
+    - ReferredUserSubscriptionStatusInactive
+  github_com_nicolailuther_butter_internal_dto.ReferredUsersListResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      summary:
+        $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUsersSummary'
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUserResponse'
+        type: array
+    type: object
+  github_com_nicolailuther_butter_internal_dto.ReferredUsersSummary:
+    properties:
+      active_subscribers:
+        type: integer
+      canceled_subscribers:
+        type: integer
+      inactive_subscribers:
+        type: integer
+      total_months_generated:
+        type: integer
+      total_referred:
+        type: integer
+    type: object
   github_com_nicolailuther_butter_internal_dto.RegisterUserRequest:
     properties:
       created_by:
@@ -637,6 +870,15 @@ definitions:
         type: string
     required:
     - accept
+    type: object
+  github_com_nicolailuther_butter_internal_dto.RevenueByPeriod:
+    properties:
+      orders_count:
+        type: integer
+      period:
+        type: string
+      revenue:
+        type: number
     type: object
   github_com_nicolailuther_butter_internal_dto.ReviewMarketplaceDeliverable:
     properties:
@@ -695,6 +937,34 @@ definitions:
     required:
     - account_id
     type: object
+  github_com_nicolailuther_butter_internal_dto.TopSeller:
+    properties:
+      email:
+        type: string
+      nickname:
+        type: string
+      orders_count:
+        type: integer
+      seller_id:
+        type: integer
+      total_revenue:
+        type: number
+    type: object
+  github_com_nicolailuther_butter_internal_dto.TopService:
+    properties:
+      category_name:
+        type: string
+      orders_count:
+        type: integer
+      seller_name:
+        type: string
+      service_id:
+        type: integer
+      title:
+        type: string
+      total_revenue:
+        type: number
+    type: object
   github_com_nicolailuther_butter_internal_dto.TrackPostRequest:
     properties:
       account_id:
@@ -706,6 +976,10 @@ definitions:
     properties:
       account_role:
         $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.AccountRole'
+      auto_generate_enabled:
+        type: boolean
+      auto_generate_hour:
+        type: integer
       bio_request:
         type: string
       cross_promo:
@@ -768,6 +1042,13 @@ definitions:
         description: Pointer to handle null values
         type: integer
     type: object
+  github_com_nicolailuther_butter_internal_dto.UpdateGeneratedContent:
+    properties:
+      is_posted:
+        type: boolean
+      maybe_posted:
+        type: boolean
+    type: object
   github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceCategory:
     properties:
       description:
@@ -790,6 +1071,8 @@ definitions:
         type: string
       nickname:
         type: string
+      user_id:
+        type: integer
     type: object
   github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceServicePackage:
     properties:
@@ -938,6 +1221,24 @@ definitions:
     - DisputeStatusUnderReview
     - DisputeStatusResolved
     - DisputeStatusClosed
+  github_com_nicolailuther_butter_internal_enums.GenerationErrorCode:
+    enum:
+    - ""
+    - limit_exceeded
+    - no_content_available
+    - no_content_files
+    - unsupported_type
+    - unsupported_platform
+    - unknown
+    type: string
+    x-enum-varnames:
+    - GenerationErrorCodeNone
+    - GenerationErrorCodeLimitExceeded
+    - GenerationErrorCodeNoContentAvailable
+    - GenerationErrorCodeNoContentFiles
+    - GenerationErrorCodeUnsupportedType
+    - GenerationErrorCodeUnsupportedPlatform
+    - GenerationErrorCodeUnknown
   github_com_nicolailuther_butter_internal_enums.GenerationStatus:
     enum:
     - queuing
@@ -1099,6 +1400,18 @@ definitions:
     - RevisionRequestStatusPending
     - RevisionRequestStatusAccepted
     - RevisionRequestStatusCompleted
+  github_com_nicolailuther_butter_internal_enums.SyncStatus:
+    enum:
+    - syncing
+    - completed
+    - failed
+    - partial
+    type: string
+    x-enum-varnames:
+    - SyncStatusSyncing
+    - SyncStatusCompleted
+    - SyncStatusFailed
+    - SyncStatusPartial
   github_com_nicolailuther_butter_internal_enums.TaskPriority:
     enum:
     - 0
@@ -1184,6 +1497,10 @@ definitions:
         $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.AccountRole'
       account_url:
         type: string
+      auto_generate_enabled:
+        type: boolean
+      auto_generate_hour:
+        type: integer
       average_views:
         type: integer
       bio:
@@ -1261,6 +1578,8 @@ definitions:
         $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.ContentType'
       created_at:
         type: string
+      error_code:
+        $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.GenerationErrorCode'
       error_message:
         description: Error tracking
         type: string
@@ -1285,6 +1604,42 @@ definitions:
       total_queued:
         type: integer
       total_requested:
+        description: Progress tracking
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  github_com_nicolailuther_butter_internal_models.AccountSyncStatus:
+    properties:
+      account_id:
+        type: integer
+      completed_at:
+        type: string
+      created_at:
+        type: string
+      error_message:
+        description: Error tracking
+        type: string
+      id:
+        type: integer
+      is_active:
+        description: IsActive flag for unique constraint - only one active sync per
+          account
+        type: boolean
+      started_at:
+        description: Timing
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/github_com_nicolailuther_butter_internal_enums.SyncStatus'
+        description: Status - acts as lock when status is 'syncing'
+      total_failed:
+        type: integer
+      total_processed:
+        type: integer
+      total_synced:
+        type: integer
+      total_to_process:
         description: Progress tracking
         type: integer
       updated_at:
@@ -1538,6 +1893,8 @@ definitions:
       is_posted:
         description: Posted status
         type: boolean
+      maybe_posted:
+        type: boolean
       text_overlay_id:
         type: integer
       type:
@@ -1788,6 +2145,8 @@ definitions:
         $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.File'
       marketplace_category_id:
         type: integer
+      platform_commission:
+        type: number
       seller_id:
         type: integer
       steps_to_start:
@@ -2706,6 +3065,239 @@ paths:
       summary: Get account limit status
       tags:
       - accounts
+  /api/v1/admin/marketplace/analytics:
+    get:
+      description: Retrieve marketplace analytics including total revenue, orders,
+        sellers, and services stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Marketplace analytics data
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceAnalytics'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get marketplace analytics dashboard data
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/analytics/category-distribution:
+    get:
+      description: Retrieve distribution of orders and revenue by category
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category distribution data
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.CategoryDistribution'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get marketplace category distribution
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/analytics/orders-by-status:
+    get:
+      description: Retrieve count of marketplace orders grouped by status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Orders count by status
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.OrdersByStatus'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get marketplace orders by status
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/analytics/revenue:
+    get:
+      description: Retrieve marketplace revenue grouped by day, week, or month
+      parameters:
+      - default: month
+        description: Period (day, week, month)
+        in: query
+        name: period
+        type: string
+      - default: 30
+        description: Number of days to look back
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Revenue data by period
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.RevenueByPeriod'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get marketplace revenue by period
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/analytics/top-sellers:
+    get:
+      description: Retrieve top performing sellers by revenue or order count
+      parameters:
+      - default: 10
+        description: Number of sellers to return
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Top sellers list
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.TopSeller'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get top marketplace sellers
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/analytics/top-services:
+    get:
+      description: Retrieve top performing services by revenue or order count
+      parameters:
+      - default: 10
+        description: Number of services to return
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Top services list
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.TopService'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get top marketplace services
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/categories:
+    get:
+      description: Retrieve all marketplace categories with service counts and order
+        stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories with analytics
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceCategoryDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all marketplace categories with admin details
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/orders:
+    get:
+      description: Retrieve all marketplace orders with buyer, seller, and service
+        details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of all orders
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all marketplace orders with admin details
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/sellers:
+    get:
+      description: Retrieve all marketplace sellers with service counts and order
+        stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sellers with analytics
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceSellerDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all marketplace sellers with admin details
+      tags:
+      - admin-marketplace
+  /api/v1/admin/marketplace/services:
+    get:
+      description: Retrieve all marketplace services with order stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of services with analytics
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.AdminMarketplaceServiceDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all marketplace services with admin details
+      tags:
+      - admin-marketplace
   /api/v1/admin/subscriptions:
     get:
       description: Returns all subscriptions with optional filters (admin only)
@@ -3990,7 +4582,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Categories
+          description: List of marketplace categories
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult'
@@ -4055,6 +4647,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4076,11 +4672,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: Marketplace category
+          description: Marketplace category details
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4112,11 +4712,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: Marketplace category
+          description: Marketplace category details
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceCategory'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4154,6 +4758,14 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceDeliverable'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4214,6 +4826,14 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4243,7 +4863,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Service Orders
+          description: List of marketplace service orders
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
@@ -4312,6 +4932,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4338,6 +4962,10 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4376,6 +5004,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4411,6 +5043,14 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4480,6 +5120,14 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4509,6 +5157,10 @@ paths:
             type: array
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4545,6 +5197,14 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceDeliverable'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4612,6 +5272,14 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4647,6 +5315,14 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4710,6 +5386,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4746,6 +5426,14 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4775,6 +5463,14 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceOrder'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4808,6 +5504,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4830,7 +5530,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Service Packages
+          description: List of marketplace service packages
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
@@ -4863,7 +5563,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Marketplace
+          description: Marketplace service package details
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
         "400":
@@ -4899,6 +5599,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4925,6 +5629,10 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -4963,6 +5671,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -4985,7 +5697,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Service Results
+          description: List of marketplace service results
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult'
@@ -5056,6 +5768,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5082,6 +5798,10 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -5121,6 +5841,14 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5137,7 +5865,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Sellers
+          description: List of marketplace sellers
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller'
@@ -5202,6 +5930,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5228,6 +5960,10 @@ paths:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
@@ -5266,6 +6002,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5279,7 +6019,7 @@ paths:
     get:
       description: Check if the user is a marketplace seller by user ID
       parameters:
-      - description: Marketplace user ID
+      - description: User ID
         in: path
         name: id
         required: true
@@ -5288,9 +6028,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: Is user a Marketplace Seller
+          description: Is user a marketplace seller
           schema:
             type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5320,7 +6064,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of Marketplace Services
+          description: List of marketplace services
           schema:
             items:
               $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceServiceDto'
@@ -5358,6 +6102,9 @@ paths:
       - in: formData
         name: marketplace_category_id
         type: integer
+      - in: formData
+        name: platform_commission
+        type: number
       - in: formData
         name: seller_id
         type: integer
@@ -5418,6 +6165,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5446,6 +6197,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5457,7 +6212,7 @@ paths:
       - marketplace
     patch:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Update an existing marketplace service
       parameters:
       - description: Marketplace service ID
@@ -5481,6 +6236,9 @@ paths:
         name: marketplace_category_id
         type: integer
       - in: formData
+        name: platform_commission
+        type: number
+      - in: formData
         name: seller_id
         type: integer
       - in: formData
@@ -5498,7 +6256,6 @@ paths:
       - description: Image to upload
         in: formData
         name: image
-        required: true
         type: file
       produces:
       - application/json
@@ -5511,6 +6268,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -5518,6 +6279,117 @@ paths:
       security:
       - BearerAuth: []
       summary: Update Marketplace Service
+      tags:
+      - marketplace
+  /api/v1/marketplace/services/{id}/details:
+    patch:
+      consumes:
+      - application/json
+      description: Update basic details of a marketplace service (title, description,
+        spots, category)
+      parameters:
+      - description: Marketplace service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Service details to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated marketplace service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Patch Marketplace Service Details
+      tags:
+      - marketplace
+  /api/v1/marketplace/services/{id}/image:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update the image of a marketplace service
+      parameters:
+      - description: Marketplace service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated marketplace service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Patch Marketplace Service Image
+      tags:
+      - marketplace
+  /api/v1/marketplace/services/{id}/seller:
+    patch:
+      consumes:
+      - application/json
+      description: Change the seller of a marketplace service
+      parameters:
+      - description: Marketplace service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New seller ID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceSeller'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated marketplace service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Patch Marketplace Service Seller
       tags:
       - marketplace
   /api/v1/notifications:
@@ -6223,7 +7095,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Automatically sync posts from Instagram by comparing video hashes
+      description: Automatically sync posts from Instagram by comparing video hashes.
+        This endpoint returns immediately and processing happens in the background.
       parameters:
       - description: Sync posts payload
         in: body
@@ -6235,7 +7108,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Sync completed successfully
+          description: Sync started successfully
           schema:
             additionalProperties:
               type: string
@@ -6539,6 +7412,61 @@ paths:
       summary: Get referral metrics
       tags:
       - referrals
+  /api/v1/referrals/referred-users:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of users who registered using the owner's referral codes
+      parameters:
+      - description: Filter by subscription status (active, canceled, inactive)
+        in: query
+        name: status
+        type: string
+      - description: Filter by registration date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by registration date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - description: Sort by field (name, email, registered_at, subscription_status,
+          plan_type)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.ReferredUsersListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get referred users
+      tags:
+      - referrals
   /api/v1/referrals/track/click/{code}:
     post:
       consumes:
@@ -6731,6 +7659,672 @@ paths:
       summary: Retry failed task
       tags:
       - tasks
+  /api/v1/seller/marketplace/categories:
+    get:
+      description: Get all marketplace categories (read-only for sellers)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceCategoryResult'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get All Categories
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/packages:
+    post:
+      consumes:
+      - application/json
+      description: Create a new package for a service owned by the authenticated seller
+      parameters:
+      - description: Package details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.CreateMarketplaceServicePackage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Created package
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Service Package
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/packages/{id}:
+    delete:
+      description: Delete a package for a service owned by the authenticated seller
+      parameters:
+      - description: Package ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Service Package
+      tags:
+      - seller-marketplace
+    patch:
+      consumes:
+      - application/json
+      description: Update a package for a service owned by the authenticated seller
+      parameters:
+      - description: Package ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated package details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceServicePackage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated package
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Service Package
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/profile:
+    get:
+      description: Get the seller profile for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Seller profile
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Seller Profile by User ID
+      tags:
+      - seller-marketplace
+    patch:
+      consumes:
+      - application/json
+      description: Update the seller profile for the authenticated user
+      parameters:
+      - description: Updated seller details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateMarketplaceSeller'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated seller profile
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceSeller'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Seller Profile
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/results:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a result image for a service owned by the authenticated
+        seller
+      parameters:
+      - in: formData
+        name: service_id
+        type: integer
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Created result
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Service Result
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/results/{id}:
+    delete:
+      description: Delete a result image for a service owned by the authenticated
+        seller
+      parameters:
+      - description: Result ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Service Result
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services:
+    get:
+      description: Get all services for the authenticated seller
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of seller services
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.MarketplaceServiceDto'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Seller Services
+      tags:
+      - seller-marketplace
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new service for the authenticated seller
+      parameters:
+      - in: formData
+        name: available_spots
+        type: integer
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: disclaimer
+        type: string
+      - in: formData
+        name: expectations
+        type: string
+      - in: formData
+        name: marketplace_category_id
+        type: integer
+      - in: formData
+        name: platform_commission
+        type: number
+      - in: formData
+        name: seller_id
+        type: integer
+      - in: formData
+        name: steps_to_start
+        type: string
+      - in: formData
+        name: terms_in
+        type: string
+      - in: formData
+        name: title
+        type: string
+      - in: formData
+        name: user_id
+        type: integer
+      - description: Image to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Created service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Seller Service
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services/{id}:
+    delete:
+      description: Delete a service owned by the authenticated seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Seller Service
+      tags:
+      - seller-marketplace
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update an existing service owned by the authenticated seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: formData
+        name: available_spots
+        type: integer
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: disclaimer
+        type: string
+      - in: formData
+        name: expectations
+        type: string
+      - in: formData
+        name: marketplace_category_id
+        type: integer
+      - in: formData
+        name: platform_commission
+        type: number
+      - in: formData
+        name: seller_id
+        type: integer
+      - in: formData
+        name: steps_to_start
+        type: string
+      - in: formData
+        name: terms_in
+        type: string
+      - in: formData
+        name: title
+        type: string
+      - in: formData
+        name: user_id
+        type: integer
+      - description: Image to upload
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Seller Service
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services/{id}/details:
+    patch:
+      consumes:
+      - application/json
+      description: Update basic details of a service owned by the authenticated seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Service details to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.PatchServiceDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Seller Service Details
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services/{id}/image:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update the image of a service owned by the authenticated seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated service
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceService'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Seller Service Image
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services/{id}/packages:
+    get:
+      description: Get all packages for a specific service owned by the authenticated
+        seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of service packages
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServicePackage'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Service Packages
+      tags:
+      - seller-marketplace
+  /api/v1/seller/marketplace/services/{id}/results:
+    get:
+      description: Get all result images for a service owned by the authenticated
+        seller
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of service results
+          schema:
+            items:
+              $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.MarketplaceServiceResult'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Service Results
+      tags:
+      - seller-marketplace
   /api/v1/subscriptions/checkout:
     post:
       consumes:
@@ -7572,6 +9166,47 @@ paths:
       summary: Get generated content by ID
       tags:
       - content-v2
+    patch:
+      consumes:
+      - application/json
+      description: Update a generated content using v2 system (only is_posted field
+        can be updated)
+      parameters:
+      - description: Generated Content ID to update
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Generated content update payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_nicolailuther_butter_internal_dto.UpdateGeneratedContent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Generated content updated successfully
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.GeneratedContent'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: Generated content not found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update generated content by ID
+      tags:
+      - content-v2
   /api/v2/content/generation/events:
     get:
       description: Subscribe to real-time generation status updates via Server-Sent
@@ -7631,6 +9266,44 @@ paths:
       summary: Get all generation status records
       tags:
       - generation
+  /api/v2/content/generation/latest-status:
+    get:
+      description: Get the most recent generation status for an account (active or
+        completed)
+      parameters:
+      - description: Account ID to check status
+        in: query
+        name: account_id
+        required: true
+        type: integer
+      - description: Content type filter (video, story, slideshow)
+        in: query
+        name: content_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Latest generation status retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.AccountGenerationStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: No generation found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get latest generation status for account
+      tags:
+      - generation
   /api/v2/content/generation/status:
     get:
       description: Get current generation status for an account
@@ -7668,6 +9341,39 @@ paths:
       summary: Get generation status for account
       tags:
       - generation
+  /api/v2/posts/sync/status:
+    get:
+      description: Get current sync status for an account
+      parameters:
+      - description: Account ID to check status
+        in: query
+        name: account_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sync status retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_models.AccountSyncStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "404":
+          description: No active sync found
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_nicolailuther_butter_internal_responses.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get sync status for account
+      tags:
+      - posts
   /auth/change-password:
     post:
       consumes:

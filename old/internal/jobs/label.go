@@ -10,11 +10,13 @@ const (
 	TaskTrackPostAnalytics           TaskLabel = "track_post_analytics"
 	TaskAutoCompleteOrders           TaskLabel = "auto_complete_orders"
 	TaskSendMarketplaceMessageDigest TaskLabel = "send_marketplace_message_digest"
+	TaskAutoGenerateContent          TaskLabel = "auto_generate_content"
+	TaskCleanupStuckGeneration       TaskLabel = "cleanup_stuck_generation"
 )
 
 func (l TaskLabel) IsValid() bool {
 	switch l {
-	case TaskTrackOnlyfansLinks, TaskTrackOnlyfansAccounts, TaskTrackAccountsAnalytics, TaskTrackPostingGoals, TaskTrackPostAnalytics, TaskAutoCompleteOrders, TaskSendMarketplaceMessageDigest:
+	case TaskTrackOnlyfansLinks, TaskTrackOnlyfansAccounts, TaskTrackAccountsAnalytics, TaskTrackPostingGoals, TaskTrackPostAnalytics, TaskAutoCompleteOrders, TaskSendMarketplaceMessageDigest, TaskAutoGenerateContent, TaskCleanupStuckGeneration:
 		return true
 	default:
 		return false

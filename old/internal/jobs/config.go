@@ -7,7 +7,8 @@ const (
 	DefaultBatchSize = 250
 
 	// DefaultNumWorkers is the default number of concurrent workers for parallel processing
-	DefaultNumWorkers = 5
+	// Reduced from 5 to 3 to prevent overwhelming the Instagram API and avoid timeout errors
+	DefaultNumWorkers = 3
 
 	// SaveAnalytics determines whether analytics should be saved during post tracking
 	SaveAnalytics = true
