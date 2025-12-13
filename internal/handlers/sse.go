@@ -46,7 +46,7 @@ func (h *Handler) Listen(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("Access-Control-Allow-Headers", "Cache-Control")
 
-	client, err := u.notificationService.SubscribeSSE(c.Request.Context(), uint(userID), deviceID)
+	client, err := h.sseService.Subscribe(c.Request.Context(), uint(userID), deviceID)
 	if err != nil {
 		responses.ErrorBadRequest(c, fmt.Sprintf("error subscribing: %v", err))
 		return
