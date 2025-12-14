@@ -1,11 +1,11 @@
-package postgres
+package database
 
 import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func NewPostgres(url string) (*gorm.DB, error) {
+func NewPostgresDatabase(url string) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	if err != nil {
 		return nil, err
