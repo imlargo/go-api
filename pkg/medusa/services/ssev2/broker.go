@@ -2,9 +2,13 @@ package ssev2
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
+
+	"github.com/imlargo/go-api/pkg/medusa/services/pubsub"
 )
 
 // Broker manages SSE connections and message routing
@@ -13,7 +17,7 @@ type Broker struct {
 	subscriptions map[string]map[string]bool // topic -> clientID -> exists
 	mu            sync.RWMutex
 	eventStore    EventStore
-	pubsub        PubSub
+	pubsubBroker  pubsub.MessageBroker
 
 	// Configuration
 	config BrokerConfig
@@ -65,30 +69,115 @@ func (b *Broker) SetEventStore(store EventStore) {
 	b.eventStore = store
 }
 
-// SetPubSub sets the pubsub system for distributed messaging
-func (b *Broker) SetPubSub(ps PubSub) error {
-	b.pubsub = ps
+// eventToMessage converts an SSE Event to a pubsub Message
+func eventToMessage(topic string, event Event) (*pubsub.Message, error) {
+	// Marshal event data to JSON
+	payload, err := json.Marshal(event.Data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal event data: %w", err)
+	}
 
-	// Subscribe to all topics this broker manages
-	return ps.Subscribe([]string{"*"}, func(topic string, event Event) {
-		b.mu.RLock()
-		clients := b.subscriptions[topic]
-		b.mu.RUnlock()
+	msg := &pubsub.Message{
+		ID:          event.ID,
+		Topic:       topic,
+		Payload:     payload,
+		Timestamp:   time.Now(),
+		ContentType: "application/json",
+		Headers:     make(map[string]string),
+	}
 
-		for clientID := range clients {
-			b.mu.RLock()
-			client, exists := b.clients[clientID]
-			b.mu.RUnlock()
+	// Store event type in headers
+	if event.Event != "" {
+		msg.Headers["event-type"] = event.Event
+	}
+	if event.Retry > 0 {
+		msg.Headers["retry"] = strconv.Itoa(event.Retry)
+	}
 
-			if exists {
-				select {
-				case client.Channel <- event:
-				case <-time.After(time.Second):
-					// Client is slow, skip
-				}
-			}
+	return msg, nil
+}
+
+// messageToEvent converts a pubsub Message to an SSE Event
+func messageToEvent(msg *pubsub.Message) Event {
+	event := Event{
+		ID: msg.ID,
+	}
+
+	// Extract event type from headers
+	if eventType, ok := msg.Headers["event-type"]; ok {
+		event.Event = eventType
+	}
+	if retryStr, ok := msg.Headers["retry"]; ok {
+		if retry, err := strconv.Atoi(retryStr); err == nil {
+			event.Retry = retry
 		}
-	})
+		// Silently ignore parse errors - retry is optional and we gracefully degrade
+	}
+
+	// Unmarshal payload to data
+	var data interface{}
+	if err := json.Unmarshal(msg.Payload, &data); err != nil {
+		// If unmarshal fails, use raw bytes as string
+		event.Data = string(msg.Payload)
+	} else {
+		event.Data = data
+	}
+
+	return event
+}
+
+// handlePubSubMessage processes incoming pubsub messages and routes them to subscribed SSE clients
+func (b *Broker) handlePubSubMessage(ctx context.Context, msg *pubsub.Message) error {
+	event := messageToEvent(msg)
+
+	// Create snapshot of clients to avoid holding lock during channel operations
+	var clientList []*Client
+	b.mu.RLock()
+	for clientID := range b.subscriptions[msg.Topic] {
+		if client, exists := b.clients[clientID]; exists {
+			clientList = append(clientList, client)
+		}
+	}
+	b.mu.RUnlock()
+
+	// Send event to all subscribed clients
+	for _, client := range clientList {
+		select {
+		case client.Channel <- event:
+		case <-time.After(time.Second):
+			// Client is slow, skip
+		}
+	}
+	return nil
+}
+
+// SetPubSub sets the pubsub system for distributed messaging
+func (b *Broker) SetPubSub(ps pubsub.MessageBroker) error {
+	b.pubsubBroker = ps
+
+	// Subscribe to all topics this broker manages using wildcard pattern
+	// Note: The wildcard pattern "*" may not be supported by all message broker implementations.
+	// For RabbitMQ, this requires proper exchange configuration (e.g., topic exchange with "#" pattern).
+	// If wildcard subscription fails, topics must be subscribed to individually via SubscribeToTopic.
+	err := ps.Subscribe(b.ctx, "*", b.handlePubSubMessage)
+	
+	// If wildcard subscription fails, clear broker reference and return error
+	// Caller should subscribe to specific topics using SubscribeToTopic
+	if err != nil {
+		b.pubsubBroker = nil
+		return fmt.Errorf("wildcard subscription not supported by this broker: use SubscribeToTopic() for each specific topic instead: %w", err)
+	}
+	
+	return nil
+}
+
+// SubscribeToTopic subscribes to a specific topic when wildcard is not supported
+func (b *Broker) SubscribeToTopic(topic string) error {
+	if b.pubsubBroker == nil {
+		return fmt.Errorf("pubsub broker not configured")
+	}
+	
+	return b.pubsubBroker.Subscribe(b.ctx, topic, b.handlePubSubMessage)
 }
 
 // Subscribe creates a new client subscription
@@ -161,8 +250,13 @@ func (b *Broker) Publish(topic string, event Event) error {
 	}
 
 	// Publish to distributed system if available
-	if b.pubsub != nil {
-		if err := b.pubsub.Publish(topic, event); err != nil {
+	if b.pubsubBroker != nil {
+		msg, err := eventToMessage(topic, event)
+		if err != nil {
+			return fmt.Errorf("failed to convert event to message: %w", err)
+		}
+
+		if err := b.pubsubBroker.Publish(b.ctx, topic, msg); err != nil {
 			return fmt.Errorf("failed to publish event: %w", err)
 		}
 		return nil
@@ -264,8 +358,8 @@ func (b *Broker) Close() error {
 		close(client.Channel)
 	}
 
-	if b.pubsub != nil {
-		return b.pubsub.Close()
+	if b.pubsubBroker != nil {
+		return b.pubsubBroker.Close()
 	}
 
 	return nil
