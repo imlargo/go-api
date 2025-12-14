@@ -98,7 +98,7 @@ func eventToMessage(topic string, event Event) (*pubsub.Message, error) {
 }
 
 // messageToEvent converts a pubsub Message to an SSE Event
-func messageToEvent(msg *pubsub.Message) (Event, error) {
+func messageToEvent(msg *pubsub.Message) Event {
 	event := Event{
 		ID: msg.ID,
 	}
@@ -123,7 +123,32 @@ func messageToEvent(msg *pubsub.Message) (Event, error) {
 		event.Data = data
 	}
 
-	return event, nil
+	return event
+}
+
+// handlePubSubMessage processes incoming pubsub messages and routes them to subscribed SSE clients
+func (b *Broker) handlePubSubMessage(ctx context.Context, msg *pubsub.Message) error {
+	event := messageToEvent(msg)
+
+	// Create snapshot of clients to avoid holding lock during channel operations
+	var clientList []*Client
+	b.mu.RLock()
+	for clientID := range b.subscriptions[msg.Topic] {
+		if client, exists := b.clients[clientID]; exists {
+			clientList = append(clientList, client)
+		}
+	}
+	b.mu.RUnlock()
+
+	// Send event to all subscribed clients
+	for _, client := range clientList {
+		select {
+		case client.Channel <- event:
+		case <-time.After(time.Second):
+			// Client is slow, skip
+		}
+	}
+	return nil
 }
 
 // SetPubSub sets the pubsub system for distributed messaging
@@ -134,36 +159,13 @@ func (b *Broker) SetPubSub(ps pubsub.MessageBroker) error {
 	// Note: The wildcard pattern "*" may not be supported by all message broker implementations.
 	// For RabbitMQ, this requires proper exchange configuration (e.g., topic exchange with "#" pattern).
 	// If wildcard subscription fails, topics must be subscribed to individually via SubscribeToTopic.
-	err := ps.Subscribe(b.ctx, "*", func(ctx context.Context, msg *pubsub.Message) error {
-		event, err := messageToEvent(msg)
-		if err != nil {
-			return fmt.Errorf("failed to convert message to event: %w", err)
-		}
-
-		b.mu.RLock()
-		clients := b.subscriptions[msg.Topic]
-		b.mu.RUnlock()
-
-		for clientID := range clients {
-			b.mu.RLock()
-			client, exists := b.clients[clientID]
-			b.mu.RUnlock()
-
-			if exists {
-				select {
-				case client.Channel <- event:
-				case <-time.After(time.Second):
-					// Client is slow, skip
-				}
-			}
-		}
-		return nil
-	})
+	err := ps.Subscribe(b.ctx, "*", b.handlePubSubMessage)
 	
-	// If wildcard subscription fails, return error but keep broker reference
+	// If wildcard subscription fails, clear broker reference and return error
 	// Caller should subscribe to specific topics using SubscribeToTopic
 	if err != nil {
-		return fmt.Errorf("wildcard subscription failed (broker-specific topics must be used): %w", err)
+		b.pubsubBroker = nil
+		return fmt.Errorf("wildcard subscription not supported by this broker: use SubscribeToTopic() for each specific topic instead: %w", err)
 	}
 	
 	return nil
@@ -175,31 +177,7 @@ func (b *Broker) SubscribeToTopic(topic string) error {
 		return fmt.Errorf("pubsub broker not configured")
 	}
 	
-	return b.pubsubBroker.Subscribe(b.ctx, topic, func(ctx context.Context, msg *pubsub.Message) error {
-		event, err := messageToEvent(msg)
-		if err != nil {
-			return fmt.Errorf("failed to convert message to event: %w", err)
-		}
-
-		b.mu.RLock()
-		clients := b.subscriptions[msg.Topic]
-		b.mu.RUnlock()
-
-		for clientID := range clients {
-			b.mu.RLock()
-			client, exists := b.clients[clientID]
-			b.mu.RUnlock()
-
-			if exists {
-				select {
-				case client.Channel <- event:
-				case <-time.After(time.Second):
-					// Client is slow, skip
-				}
-			}
-		}
-		return nil
-	})
+	return b.pubsubBroker.Subscribe(b.ctx, topic, b.handlePubSubMessage)
 }
 
 // Subscribe creates a new client subscription
