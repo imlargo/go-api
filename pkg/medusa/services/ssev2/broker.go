@@ -91,7 +91,7 @@ func eventToMessage(topic string, event Event) (*pubsub.Message, error) {
 		msg.Headers["event-type"] = event.Event
 	}
 	if event.Retry > 0 {
-		msg.Headers["retry"] = fmt.Sprintf("%d", event.Retry)
+		msg.Headers["retry"] = strconv.Itoa(event.Retry)
 	}
 
 	return msg, nil
@@ -111,6 +111,7 @@ func messageToEvent(msg *pubsub.Message) (Event, error) {
 		if retry, err := strconv.Atoi(retryStr); err == nil {
 			event.Retry = retry
 		}
+		// Silently ignore parse errors - retry is optional and we gracefully degrade
 	}
 
 	// Unmarshal payload to data
@@ -132,8 +133,49 @@ func (b *Broker) SetPubSub(ps pubsub.MessageBroker) error {
 	// Subscribe to all topics this broker manages using wildcard pattern
 	// Note: The wildcard pattern "*" may not be supported by all message broker implementations.
 	// For RabbitMQ, this requires proper exchange configuration (e.g., topic exchange with "#" pattern).
-	// If the broker doesn't support wildcards, subscribe to specific topics after calling this method.
-	return ps.Subscribe(b.ctx, "*", func(ctx context.Context, msg *pubsub.Message) error {
+	// If wildcard subscription fails, topics must be subscribed to individually via SubscribeToTopic.
+	err := ps.Subscribe(b.ctx, "*", func(ctx context.Context, msg *pubsub.Message) error {
+		event, err := messageToEvent(msg)
+		if err != nil {
+			return fmt.Errorf("failed to convert message to event: %w", err)
+		}
+
+		b.mu.RLock()
+		clients := b.subscriptions[msg.Topic]
+		b.mu.RUnlock()
+
+		for clientID := range clients {
+			b.mu.RLock()
+			client, exists := b.clients[clientID]
+			b.mu.RUnlock()
+
+			if exists {
+				select {
+				case client.Channel <- event:
+				case <-time.After(time.Second):
+					// Client is slow, skip
+				}
+			}
+		}
+		return nil
+	})
+	
+	// If wildcard subscription fails, return error but keep broker reference
+	// Caller should subscribe to specific topics using SubscribeToTopic
+	if err != nil {
+		return fmt.Errorf("wildcard subscription failed (broker-specific topics must be used): %w", err)
+	}
+	
+	return nil
+}
+
+// SubscribeToTopic subscribes to a specific topic when wildcard is not supported
+func (b *Broker) SubscribeToTopic(topic string) error {
+	if b.pubsubBroker == nil {
+		return fmt.Errorf("pubsub broker not configured")
+	}
+	
+	return b.pubsubBroker.Subscribe(b.ctx, topic, func(ctx context.Context, msg *pubsub.Message) error {
 		event, err := messageToEvent(msg)
 		if err != nil {
 			return fmt.Errorf("failed to convert message to event: %w", err)
