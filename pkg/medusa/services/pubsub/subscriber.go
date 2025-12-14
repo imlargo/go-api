@@ -2,116 +2,89 @@ package pubsub
 
 import "context"
 
-// Subscriber defines the contract for subscribing to topics and consuming messages
+// Subscriber defines the interface for consuming messages
 type Subscriber interface {
-	// Subscribe registers a handler for messages on a topic
+	// Subscribe registers a handler for a topic
 	Subscribe(ctx context.Context, topic string, handler MessageHandler, opts ...SubscribeOption) error
-	// Unsubscribe removes a subscription from a topic
+
+	// Unsubscribe removes a subscription
 	Unsubscribe(topic string) error
-	// Close gracefully shuts down the subscriber
+
+	// Close closes the subscriber and releases resources
 	Close() error
 }
 
-// SubscribeOption configures subscription behavior
-type SubscribeOption func(*SubscribeOptions)
-
-// SubscribeOptions holds options for subscribing
+// SubscribeOptions configures subscription behavior
 type SubscribeOptions struct {
-	QueueName     string
-	Durable       bool
-	AutoDelete    bool
-	Exclusive     bool
-	NoWait        bool
-	ConsumerTag   string
-	QoS           *QoSConfig
-	RetryPolicy   *RetryPolicy
-	DeadLetter    *DeadLetterConfig
-	Middleware    []Middleware
-	ErrorHandler  ErrorHandler
-	AutoAck       bool
-	PrefetchCount int
+	QueueName         string
+	ConsumerTag       string
+	AutoAck           bool
+	Exclusive         bool
+	PrefetchCount     int
+	PrefetchSize      int
+	RetryPolicy       *RetryPolicy
+	DeadLetterQueue   *DeadLetterQueue
+	CircuitBreaker    *CircuitBreakerConfig
+	Middleware        MiddlewareChain
+	ConcurrentWorkers int
 }
 
-// WithQueueName specifies a custom queue name
+// SubscribeOption is a functional option for Subscribe
+type SubscribeOption func(*SubscribeOptions)
+
+// WithQueueName sets the queue name
 func WithQueueName(name string) SubscribeOption {
 	return func(o *SubscribeOptions) {
 		o.QueueName = name
 	}
 }
 
-// WithDurable makes the queue durable
-func WithDurable() SubscribeOption {
+// WithAutoAck enables/disables auto-acknowledgement
+func WithAutoAck(autoAck bool) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.Durable = true
+		o.AutoAck = autoAck
 	}
 }
 
-// WithAutoDelete enables auto-deletion of the queue
-func WithAutoDelete() SubscribeOption {
+// WithPrefetch sets prefetch count and size
+func WithPrefetch(count, size int) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.AutoDelete = true
+		o.PrefetchCount = count
+		o.PrefetchSize = size
 	}
 }
 
-// WithExclusive makes the queue exclusive
-func WithExclusive() SubscribeOption {
+// WithRetryPolicy sets retry policy
+func WithRetryPolicy(policy *RetryPolicy) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.Exclusive = true
+		o.RetryPolicy = policy
 	}
 }
 
-// WithConsumerTag sets a custom consumer tag
-func WithConsumerTag(tag string) SubscribeOption {
+// WithDeadLetterQueue sets DLQ configuration
+func WithDeadLetterQueue(dlq *DeadLetterQueue) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.ConsumerTag = tag
+		o.DeadLetterQueue = dlq
 	}
 }
 
-// WithQoS sets Quality of Service parameters
-func WithQoS(qos QoSConfig) SubscribeOption {
+// WithCircuitBreaker sets circuit breaker configuration
+func WithCircuitBreaker(cb *CircuitBreakerConfig) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.QoS = &qos
-	}
-}
-
-// WithRetryPolicy sets retry behavior
-func WithRetryPolicy(policy RetryPolicy) SubscribeOption {
-	return func(o *SubscribeOptions) {
-		o.RetryPolicy = &policy
-	}
-}
-
-// WithDeadLetter configures dead letter queue
-func WithDeadLetter(config DeadLetterConfig) SubscribeOption {
-	return func(o *SubscribeOptions) {
-		o.DeadLetter = &config
+		o.CircuitBreaker = cb
 	}
 }
 
 // WithMiddleware adds middleware to the subscription
-func WithMiddleware(middleware ...Middleware) SubscribeOption {
+func WithMiddleware(mw ...Middleware) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.Middleware = append(o.Middleware, middleware...)
+		o.Middleware = append(o.Middleware, mw...)
 	}
 }
 
-// WithErrorHandler sets custom error handling
-func WithErrorHandler(handler ErrorHandler) SubscribeOption {
+// WithConcurrency sets concurrent workers for message processing
+func WithConcurrency(workers int) SubscribeOption {
 	return func(o *SubscribeOptions) {
-		o.ErrorHandler = handler
-	}
-}
-
-// WithAutoAck enables automatic acknowledgment
-func WithAutoAck() SubscribeOption {
-	return func(o *SubscribeOptions) {
-		o.AutoAck = true
-	}
-}
-
-// WithPrefetchCount sets the prefetch count
-func WithPrefetchCount(count int) SubscribeOption {
-	return func(o *SubscribeOptions) {
-		o.PrefetchCount = count
+		o.ConcurrentWorkers = workers
 	}
 }

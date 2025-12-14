@@ -5,67 +5,66 @@ import (
 	"time"
 )
 
-// Publisher defines the contract for publishing messages to topics/exchanges
+// Publisher defines the interface for publishing messages
 type Publisher interface {
-	// Publish sends a message to the specified topic with options
-	Publish(ctx context.Context, topic string, message *Message, opts ...PublishOption) error
-	// Close gracefully shuts down the publisher
+	// Publish sends a message to a topic
+	Publish(ctx context.Context, topic string, msg *Message) error
+
+	// PublishBatch sends multiple messages atomically
+	PublishBatch(ctx context.Context, messages []*Message) error
+
+	// Request sends a message and waits for a reply (RPC pattern)
+	Request(ctx context.Context, topic string, msg *Message, timeout time.Duration) (*Message, error)
+
+	// Close closes the publisher and releases resources
 	Close() error
 }
 
-// PublishOption configures message publishing
-type PublishOption func(*PublishOptions)
-
-// PublishOptions holds options for publishing
+// PublishOptions configures publish behavior
 type PublishOptions struct {
-	Persistent    bool
-	Priority      uint8
-	Expiration    time.Duration
-	Headers       map[string]interface{}
-	CorrelationID string
-	ReplyTo       string
-	Mandatory     bool
-	Immediate     bool
+	Mandatory   bool
+	Immediate   bool
+	ContentType string
+	Priority    int
+	TTL         time.Duration
+	Persistent  bool
+	Headers     map[string]interface{}
 }
 
-// WithPersistent makes the message persistent
-func WithPersistent() PublishOption {
+// PublishOption is a functional option for Publish
+type PublishOption func(*PublishOptions)
+
+// WithMandatory sets mandatory flag
+func WithMandatory(mandatory bool) PublishOption {
 	return func(o *PublishOptions) {
-		o.Persistent = true
+		o.Mandatory = mandatory
 	}
 }
 
-// WithPriority sets message priority (0-9)
-func WithPriority(priority uint8) PublishOption {
+// WithPriority sets message priority
+func WithPriority(priority int) PublishOption {
 	return func(o *PublishOptions) {
 		o.Priority = priority
 	}
 }
 
-// WithExpiration sets message TTL
-func WithExpiration(ttl time.Duration) PublishOption {
+// WithTTL sets message time-to-live
+func WithTTL(ttl time.Duration) PublishOption {
 	return func(o *PublishOptions) {
-		o.Expiration = ttl
+		o.TTL = ttl
 	}
 }
 
-// WithHeaders adds custom headers
+// WithPersistent sets persistence mode
+func WithPersistent(persistent bool) PublishOption {
+	return func(o *PublishOptions) {
+		o.Persistent = persistent
+	}
+}
+
+// WithHeaders sets custom headers
 func WithHeaders(headers map[string]interface{}) PublishOption {
 	return func(o *PublishOptions) {
 		o.Headers = headers
-	}
-}
-
-// WithCorrelationID sets correlation ID for request-reply pattern
-func WithCorrelationID(id string) PublishOption {
-	return func(o *PublishOptions) {
-		o.CorrelationID = id
-	}
-}
-
-// WithReplyTo sets the reply-to queue for RPC pattern
-func WithReplyTo(queue string) PublishOption {
-	return func(o *PublishOptions) {
-		o.ReplyTo = queue
 	}
 }
