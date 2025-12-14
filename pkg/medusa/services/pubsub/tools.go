@@ -1,10 +1,7 @@
 package pubsub
 
-import (
-	"fmt"
-	"time"
-)
+import "github.com/google/uuid"
 
 func generateID() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+	return uuid.New().String()
 }
