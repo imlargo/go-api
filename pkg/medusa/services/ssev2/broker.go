@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -107,13 +108,15 @@ func messageToEvent(msg *pubsub.Message) (Event, error) {
 		event.Event = eventType
 	}
 	if retryStr, ok := msg.Headers["retry"]; ok {
-		fmt.Sscanf(retryStr, "%d", &event.Retry)
+		if retry, err := strconv.Atoi(retryStr); err == nil {
+			event.Retry = retry
+		}
 	}
 
 	// Unmarshal payload to data
 	var data interface{}
 	if err := json.Unmarshal(msg.Payload, &data); err != nil {
-		// If unmarshal fails, use raw bytes
+		// If unmarshal fails, use raw bytes as string
 		event.Data = string(msg.Payload)
 	} else {
 		event.Data = data
@@ -127,8 +130,9 @@ func (b *Broker) SetPubSub(ps pubsub.MessageBroker) error {
 	b.pubsubBroker = ps
 
 	// Subscribe to all topics this broker manages using wildcard pattern
-	// Note: The actual implementation depends on the broker's capability
-	// For now, we'll subscribe to a catch-all topic pattern
+	// Note: The wildcard pattern "*" may not be supported by all message broker implementations.
+	// For RabbitMQ, this requires proper exchange configuration (e.g., topic exchange with "#" pattern).
+	// If the broker doesn't support wildcards, subscribe to specific topics after calling this method.
 	return ps.Subscribe(b.ctx, "*", func(ctx context.Context, msg *pubsub.Message) error {
 		event, err := messageToEvent(msg)
 		if err != nil {
